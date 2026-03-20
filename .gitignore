@@ -1,0 +1,26 @@
+# Godot editor cache
+.godot/
+
+# Android build template (version-specific, must be regenerated per Godot version)
+android/build/
+android/.build_version
+
+# Android build artifacts
+android/.gradle/
+android/plugins/
+android/plugin/build/
+android/local.properties
+
+# Godot-lib (version-specific, must match user's Godot version)
+android/plugin/libs/godot-lib.template_release.aar
+
+# SDK build output
+SDK/
+
+# OS files
+.DS_Store
+*.tmp
+
+# Export presets and credentials (user-specific)
+export_presets.cfg
+.godot/export_credentials.cfg
