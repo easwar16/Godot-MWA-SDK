@@ -25,7 +25,7 @@ func _ready() -> void:
 	adapter.identity = MWATypes.DappIdentity.new(
 		"MWA SDK Demo",
 		"https://solanamobile.com",
-		"favicon.ico"
+		"icon.png"
 	)
 
 	# Enable debug logging.

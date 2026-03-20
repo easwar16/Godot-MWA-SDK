@@ -134,7 +134,7 @@ class DappIdentity:
 	var icon: String
 	var name: String
 
-	func _init(p_name: String = "Godot dApp", p_uri: String = "https://solana.com", p_icon: String = "favicon.ico") -> void:
+	func _init(p_name: String = "Godot dApp", p_uri: String = "https://solana.com", p_icon: String = "icon.png") -> void:
 		name = p_name
 		uri = p_uri
 		icon = p_icon

@@ -113,14 +113,25 @@ func _on_auth_failed(error_code: int, error_message: String):
 
 See [docs/INSTALLATION.md](docs/INSTALLATION.md) for the full setup guide.
 
-Short version:
+### Quick setup (recommended)
+
+Run the setup script from the project root:
+
+```bash
+./setup.sh
+```
+
+This automatically handles all build steps: extracting `godot-lib.aar`, installing the Android build template, building the Kotlin plugin, and generating the debug keystore. After it completes, open the project in Godot and configure the Android export preset (see script output for settings).
+
+### Manual setup
 
 1. Copy `addons/solana_mwa/` into your project
 2. Enable the plugin in Project Settings > Plugins
-3. Install the Android build template (Project > Install Android Build Template)
-4. Build the Kotlin plugin: `cd android && ./gradlew :plugin:assembleRelease`
-5. Copy the AAR to `android/plugins/` with a `.gdap` manifest
-6. Configure Android export with Gradle build enabled
+3. Install the Android build template (Project > Install Android Build Template, or run `setup.sh`)
+4. Extract `godot-lib.template_release.aar` from your export templates into `android/plugin/libs/`
+5. Build the Kotlin plugin: `cd android && ./gradlew :plugin:assembleRelease`
+6. Copy the AAR to `android/plugins/` with a `.gdap` manifest
+7. Configure Android export with Gradle build enabled
 
 The `godot-lib.aar`, Android build template, and export templates must all match your Godot editor version. See the troubleshooting section in INSTALLATION.md if you get version mismatch errors.
 

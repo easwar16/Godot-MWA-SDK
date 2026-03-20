@@ -9,7 +9,30 @@
 
 > **Important:** The `godot-lib.aar`, Android build template, and export templates must all match your exact Godot version. Mixing versions (e.g., 4.6 templates with 4.7 editor) will cause `Android build version mismatch` errors.
 
-## Setup
+## Automated Setup (Recommended)
+
+Run the setup script from the project root:
+
+```bash
+./setup.sh
+```
+
+This handles steps 3–4 automatically:
+- Installs the Android build template from your export templates
+- Extracts `godot-lib.aar` matching your Godot version
+- Builds the Kotlin plugin
+- Copies the AAR and `.gdap` manifest to `android/plugins/`
+- Generates a debug keystore if you don't have one
+
+After running the script, skip to [Step 5: Configure Android Export](#5-configure-android-export).
+
+You can set `GODOT_BIN` if your Godot binary isn't named `godot`:
+
+```bash
+GODOT_BIN=/path/to/godot ./setup.sh
+```
+
+## Manual Setup
 
 ### 1. Add the Plugin
 
@@ -39,7 +62,25 @@ This registers the `MWA` autoload singleton, giving you global access via `MWA.a
 
 ### 3. Install Android Build Template
 
-Go to **Project > Install Android Build Template...** This creates the `android/build/` directory with files matching your Godot version.
+**Option A (Godot UI):** Go to **Project > Install Android Build Template...** This creates the `android/build/` directory with files matching your Godot version.
+
+**Option B (CLI):** Extract manually from your export templates:
+
+```bash
+# Find your templates directory:
+#   macOS: ~/Library/Application Support/Godot/export_templates/<version>/
+#   Linux: ~/.local/share/godot/export_templates/<version>/
+#   Windows: %APPDATA%/Godot/export_templates/<version>/
+
+unzip "<templates_dir>/android_source.zip" -d android/build/
+```
+
+After extracting, create the version marker so Godot recognizes the template:
+
+```bash
+# Replace with your exact Godot version (run: godot --version)
+echo -n "4.6.1.stable" > android/.build_version
+```
 
 > **Do this BEFORE building the plugin.** The build template must exist first.
 
@@ -115,7 +156,12 @@ remote=["com.solanamobile:mobile-wallet-adapter-clientlib-ktx:2.0.3", "org.jetbr
 4. Set **Min SDK** to **24** (Android 7.0)
 5. Set **Target SDK** to **34**
 6. Under **Permissions**, add `android.permission.INTERNET`
-7. Under **Architectures**, enable **arm64-v8a**
+7. Under **Architectures**, enable **arm64-v8a** (for devices) or **x86_64** (for emulators)
+8. Under **Keystore > Debug**, set the path to your debug keystore:
+   - Default location: `~/.android/debug.keystore`
+   - User: `androiddebugkey`
+   - Password: `android`
+   - If you don't have one, generate it: `keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"`
 
 ### 6. Install a Wallet
 
@@ -125,7 +171,7 @@ Install an MWA-compatible wallet on your Android device or emulator:
 
 ### 7. Set Rendering Mode (Optional)
 
-If testing on an emulator, set the rendering mode to OpenGL compatibility in `project.godot`:
+If testing on an emulator, the project already defaults to OpenGL compatibility mode. If you changed it, set it back in `project.godot`:
 
 ```ini
 [rendering]
@@ -162,7 +208,7 @@ func _on_auth_failed(error_code: int, error_message: String):
 This is the most common setup issue. It means one of these doesn't match your Godot editor version:
 
 1. **Export templates** — Go to **Editor > Manage Export Templates** and install templates for your exact version
-2. **Android build template** — Delete `android/build/` and go to **Project > Install Android Build Template...** to reinstall
+2. **Android build template** — Delete `android/build/` and `android/.build_version`, then reinstall (Project > Install Android Build Template, or re-run `./setup.sh`)
 3. **godot-lib.aar** — Re-extract from the export templates matching your version (Step 4a above)
 
 All three must be the same version as your Godot editor (e.g., all 4.6.1.stable).
@@ -187,3 +233,7 @@ All three must be the same version as your Godot editor (e.g., all 4.6.1.stable)
 ### Authorization request failed
 - The auth token from a previous session may have expired. Clear the cache and reconnect.
 - Make sure the cluster matches your wallet's network (e.g., Mainnet wallet won't work with Devnet cluster).
+
+### No debug keystore / signing errors
+- Generate one: `keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"`
+- Make sure the export preset points to the correct keystore path.
