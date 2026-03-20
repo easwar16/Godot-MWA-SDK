@@ -6,7 +6,7 @@ Built for API parity with the [React Native MWA SDK](https://docs.solanamobile.c
 
 ## What is Mobile Wallet Adapter?
 
-MWA is a protocol that lets mobile apps communicate with wallet apps on the same device. Instead of embedding a wallet or managing private keys, your game sends signing requests to an external wallet (Phantom, Solflare, etc.) over a local connection. The wallet handles key management and approval UI. Your game gets back signed transactions.
+MWA is a protocol that lets mobile apps communicate with wallet apps on the same device. Instead of embedding a wallet or managing private keys, your game sends signing requests to an external wallet (Phantom, Solflare, etc.) over a local connection. The wallet handles key management and approval UI.
 
 The protocol defines these operations:
 
