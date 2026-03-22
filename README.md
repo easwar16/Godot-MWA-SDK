@@ -286,7 +286,9 @@ The abstract interface has four methods: `get_authorization()`, `set_authorizati
 The `example/` directory contains a demo app that exercises every SDK method, styled with a dark Solana-themed UI.
 
 <p align="center">
-  <img src="docs/screenshot_app_running.png" width="300" alt="MWA SDK Demo App" />
+  <video src="https://github.com/user-attachments/assets/ef154db4-df71-4e25-aeaa-92fcaa39b04d" width="300" controls>
+    Your browser does not support the video tag.
+  </video>
 </p>
 
 Features:
