@@ -21,6 +21,10 @@ SDK/
 .DS_Store
 *.tmp
 
+# Godot UID and import metadata
+*.uid
+*.import
+
 # Export presets and credentials (user-specific)
 export_presets.cfg
 .godot/export_credentials.cfg
