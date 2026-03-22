@@ -516,13 +516,13 @@ func _on_authorized(result) -> void:
 	_show_toast("Wallet connected: %s" % _shorten(addr))
 	_log("[color=#00d4aa]Connected![/color] %s" % _shorten(addr))
 	_log("  Auth token: %s..." % result.auth_token.substr(0, 16))
-	if result.sign_in_result.size() > 0:
+	if result.sign_in_result != null:
 		_log("[color=#9945ff]  SIWS verified[/color]")
-		for key in result.sign_in_result:
-			var val = result.sign_in_result[key]
-			if val is String and val.length() > 40:
-				val = val.substr(0, 40) + "..."
-			_log("    %s: %s" % [key, str(val)])
+		_log("    signature_type: %s" % result.sign_in_result.signature_type)
+		if result.sign_in_result.signature.size() > 0:
+			var sig_b64 := Marshalls.raw_to_base64(
+				result.sign_in_result.signature)
+			_log("    signature: %s..." % sig_b64.substr(0, 40))
 	_update_steps()
 
 
