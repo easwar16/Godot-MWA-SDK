@@ -9,9 +9,9 @@ bg_color = Color(0.055, 0.055, 0.075, 1)
 bg_color = Color(0.075, 0.075, 0.1, 1)
 border_width_bottom = 1
 border_color = Color(0.15, 0.15, 0.2, 1)
-content_margin_left = 20.0
-content_margin_top = 20.0
-content_margin_right = 20.0
+content_margin_left = 22.0
+content_margin_top = 56.0
+content_margin_right = 22.0
 content_margin_bottom = 20.0
 
 [sub_resource type="StyleBoxFlat" id="c1"]
@@ -221,19 +221,19 @@ theme_override_constants/separation = 2
 layout_mode = 2
 text = "Solana MWA SDK"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 34
 
 [node name="Subtitle" type="Label" parent="Bg/MainVBox/Header/HBox/TitleCol"]
 layout_mode = 2
 text = "Test wallet adapter flows interactively"
 theme_override_colors/font_color = Color(0.6, 0.6, 0.7, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 18
 
 [node name="ClusterOption" type="OptionButton" parent="Bg/MainVBox/Header/HBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 18
 
 [node name="Scroll" type="ScrollContainer" parent="Bg/MainVBox"]
 layout_mode = 2
@@ -272,7 +272,7 @@ theme_override_constants/separation = 30
 layout_mode = 2
 text = "1"
 theme_override_colors/font_color = Color(0.0, 0.83, 0.67, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 34
 
 [node name="TitleCol" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V/HeaderRow"]
 layout_mode = 2
@@ -283,20 +283,20 @@ theme_override_constants/separation = 3
 layout_mode = 2
 text = "Connect Wallet"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 26
 
 [node name="Desc" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V/HeaderRow/TitleCol"]
 layout_mode = 2
 text = "Link your MWA-compatible wallet to begin"
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 18
 
 [node name="ConnectBtn" type="Button" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.02, 0.02, 0.03, 1)
 theme_override_colors/font_hover_color = Color(0.02, 0.02, 0.03, 1)
-theme_override_font_sizes/font_size = 17
+theme_override_font_sizes/font_size = 22
 text = "Connect Wallet"
 theme_override_styles/normal = SubResource("bg1")
 
@@ -309,14 +309,14 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "●"
 theme_override_colors/font_color = Color(1.0, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 14
 
 [node name="StatusLabel" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V/StatusRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Disconnected"
 theme_override_colors/font_color = Color(1.0, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 18
 
 ; ── STEP 2: AUTHORIZE SESSION ──
 
@@ -337,7 +337,7 @@ theme_override_constants/separation = 30
 layout_mode = 2
 text = "2"
 theme_override_colors/font_color = Color(0.6, 0.27, 1.0, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 34
 
 [node name="TitleCol" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step2Card/V/HeaderRow"]
 layout_mode = 2
@@ -348,13 +348,13 @@ theme_override_constants/separation = 3
 layout_mode = 2
 text = "Authorize Session"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 26
 
 [node name="Desc" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step2Card/V/HeaderRow/TitleCol"]
 layout_mode = 2
 text = "Verify identity with Sign In With Solana"
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 18
 
 [node name="Step2Content" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step2Card/V"]
 unique_name_in_owner = true
@@ -365,7 +365,7 @@ theme_override_constants/separation = 10
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 17
+theme_override_font_sizes/font_size = 22
 text = "Sign In With Solana"
 theme_override_styles/normal = SubResource("bp1")
 
@@ -374,7 +374,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "No wallet connected yet"
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 18
 autowrap_mode = 2
 text_overrun_behavior = 3
 
@@ -383,7 +383,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Connect wallet first to enable"
 theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 16
 
 ; ── STEP 3: WALLET ACTIONS ──
 
@@ -404,7 +404,7 @@ theme_override_constants/separation = 30
 layout_mode = 2
 text = "3"
 theme_override_colors/font_color = Color(0.29, 0.62, 1.0, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 34
 
 [node name="TitleCol" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/HeaderRow"]
 layout_mode = 2
@@ -415,13 +415,13 @@ theme_override_constants/separation = 3
 layout_mode = 2
 text = "Wallet Actions"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 26
 
 [node name="Desc" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/HeaderRow/TitleCol"]
 layout_mode = 2
 text = "Sign transactions and messages"
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 18
 
 [node name="Step3Content" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V"]
 unique_name_in_owner = true
@@ -437,7 +437,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.29, 0.62, 1.0, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "Sign Transaction"
 theme_override_styles/normal = SubResource("bb1")
 
@@ -446,7 +446,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.29, 0.62, 1.0, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "Sign & Send"
 theme_override_styles/normal = SubResource("bb1")
 
@@ -459,7 +459,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.29, 0.62, 1.0, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "Sign Message"
 theme_override_styles/normal = SubResource("bb1")
 
@@ -468,7 +468,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.29, 0.62, 1.0, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "Check Features"
 theme_override_styles/normal = SubResource("bb1")
 
@@ -477,7 +477,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Authorize session to continue"
 theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 16
 
 ; ── STEP 4: SESSION MANAGEMENT ──
 
@@ -498,7 +498,7 @@ theme_override_constants/separation = 30
 layout_mode = 2
 text = "4"
 theme_override_colors/font_color = Color(0.91, 0.66, 0.22, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 34
 
 [node name="TitleCol" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V/HeaderRow"]
 layout_mode = 2
@@ -509,13 +509,13 @@ theme_override_constants/separation = 3
 layout_mode = 2
 text = "Session Management"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 26
 
 [node name="Desc" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V/HeaderRow/TitleCol"]
 layout_mode = 2
 text = "Manage connection lifecycle"
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 18
 
 [node name="Step4Content" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V"]
 unique_name_in_owner = true
@@ -531,7 +531,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.91, 0.66, 0.22, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "Reconnect"
 theme_override_styles/normal = SubResource("bo1")
 
@@ -540,7 +540,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1.0, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "Disconnect"
 theme_override_styles/normal = SubResource("br1")
 
@@ -553,7 +553,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1.0, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "Deauthorize"
 theme_override_styles/normal = SubResource("br1")
 
@@ -562,7 +562,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.55, 0.55, 0.65, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "Reset Session"
 theme_override_styles/normal = SubResource("brs")
 
@@ -571,7 +571,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Connect wallet to enable"
 theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 16
 
 ; ── OUTPUT LOG (COLLAPSIBLE) ──
 
@@ -583,7 +583,7 @@ theme_override_styles/separator = SubResource("sep")
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 18
 text = "Show Output Log"
 theme_override_styles/normal = SubResource("brs")
 
@@ -598,7 +598,7 @@ theme_override_styles/panel = SubResource("lgp")
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/default_color = Color(0.65, 0.68, 0.75, 1)
-theme_override_font_sizes/normal_font_size = 13
+theme_override_font_sizes/normal_font_size = 15
 bbcode_enabled = true
 text = ""
 scroll_following = true
@@ -638,5 +638,5 @@ theme_override_styles/panel = SubResource("tst")
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.0, 0.83, 0.67, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 18
 autowrap_mode = 2
