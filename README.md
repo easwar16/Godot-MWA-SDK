@@ -1,5 +1,11 @@
 # Godot MWA SDK
 
+<p align="center">
+  <video src="https://github.com/user-attachments/assets/ef154db4-df71-4e25-aeaa-92fcaa39b04d" width="300" controls>
+    Your browser does not support the video tag.
+  </video>
+</p>
+
 GDScript SDK for the Solana [Mobile Wallet Adapter](https://docs.solanamobile.com/getting-started/overview) protocol. Wraps the MWA 2.0 client library so Godot games can authorize wallets, sign transactions, and sign messages on Android using Phantom, Solflare, or any MWA-compatible wallet.
 
 Built for API parity with the [React Native MWA SDK](https://docs.solanamobile.com/react-native/overview). If you've used `transact(wallet => wallet.authorize(...))` in React Native, the Godot equivalent is `MWA.adapter.authorize()`.
@@ -283,13 +289,7 @@ The abstract interface has four methods: `get_authorization()`, `set_authorizati
 
 ## Example App
 
-The `example/` directory contains a demo app that exercises every SDK method, styled with a dark Solana-themed UI.
-
-<p align="center">
-  <video src="https://github.com/user-attachments/assets/ef154db4-df71-4e25-aeaa-92fcaa39b04d" width="300" controls>
-    Your browser does not support the video tag.
-  </video>
-</p>
+The `example/` directory contains a demo app that exercises every SDK method, styled with a dark Solana-themed UI (see demo video above).
 
 Features:
 
