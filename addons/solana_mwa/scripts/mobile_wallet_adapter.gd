@@ -112,7 +112,7 @@ func _ready() -> void:
 			current_auth = cached
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if _poll_action == "" or _android_plugin == null:
 		return
 	_poll_android_status()
@@ -229,7 +229,10 @@ func deauthorize() -> void:
 		return
 
 	state = MWATypes.ConnectionState.DEAUTHORIZING
-	_android_plugin.call("deauthorize", identity.uri, identity.icon, identity.name, MWATypes.cluster_to_chain(cluster), current_auth.auth_token)
+	var chain := MWATypes.cluster_to_chain(cluster)
+	_android_plugin.call(
+		"deauthorize", identity.uri, identity.icon,
+		identity.name, chain, current_auth.auth_token)
 	_start_operation("deauthorize")
 
 
@@ -263,7 +266,10 @@ func get_capabilities() -> void:
 	if current_auth != null and current_auth.auth_token != "":
 		auth_token = current_auth.auth_token
 
-	_android_plugin.call("getCapabilities", identity.uri, identity.icon, identity.name, MWATypes.cluster_to_chain(cluster), auth_token)
+	var chain := MWATypes.cluster_to_chain(cluster)
+	_android_plugin.call(
+		"getCapabilities", identity.uri, identity.icon,
+		identity.name, chain, auth_token)
 	_start_operation("get_capabilities")
 
 
@@ -288,7 +294,10 @@ func sign_transactions(payloads: Array) -> void:
 	for payload in payloads:
 		encoded.append(Marshalls.raw_to_base64(payload))
 
-	_android_plugin.call("signTransactions", identity.uri, identity.icon, identity.name, MWATypes.cluster_to_chain(cluster), current_auth.auth_token, encoded)
+	var chain := MWATypes.cluster_to_chain(cluster)
+	_android_plugin.call(
+		"signTransactions", identity.uri, identity.icon,
+		identity.name, chain, current_auth.auth_token, encoded)
 	_start_operation("sign_transactions")
 
 
@@ -317,7 +326,10 @@ func sign_and_send_transactions(payloads: Array, options = null) -> void:
 	if options != null:
 		options_json = JSON.stringify(options.to_dict())
 
-	_android_plugin.call("signAndSendTransactions", identity.uri, identity.icon, identity.name, MWATypes.cluster_to_chain(cluster), current_auth.auth_token, encoded, options_json)
+	var chain := MWATypes.cluster_to_chain(cluster)
+	_android_plugin.call(
+		"signAndSendTransactions", identity.uri, identity.icon,
+		identity.name, chain, current_auth.auth_token, encoded, options_json)
 	_start_operation("sign_and_send_transactions")
 
 
@@ -346,7 +358,10 @@ func sign_messages(messages: Array, addresses: PackedStringArray = []) -> void:
 	if addresses.is_empty() and current_auth.accounts.size() > 0:
 		addresses.append(current_auth.accounts[0].address)
 
-	_android_plugin.call("signMessages", identity.uri, identity.icon, identity.name, MWATypes.cluster_to_chain(cluster), current_auth.auth_token, encoded, addresses)
+	var chain := MWATypes.cluster_to_chain(cluster)
+	_android_plugin.call(
+		"signMessages", identity.uri, identity.icon,
+		identity.name, chain, current_auth.auth_token, encoded, addresses)
 	_start_operation("sign_messages")
 
 
@@ -468,7 +483,9 @@ func authorize_and_sign_and_send_transactions(payloads: Array, sign_in_payload =
 
 ## Authorize and sign messages in a single wallet session.
 ## Emits authorized() then messages_signed() on success.
-func authorize_and_sign_messages(messages_to_sign: Array, addresses: PackedStringArray = [], sign_in_payload = null) -> void:
+func authorize_and_sign_messages(
+		messages_to_sign: Array, addresses: PackedStringArray = [],
+		sign_in_payload = null) -> void:
 	if _android_plugin == null:
 		authorization_failed.emit(MWATypes.ErrorCode.AUTHORIZATION_FAILED, "Android plugin not available")
 		return
@@ -523,8 +540,7 @@ func authorize_async(sign_in_payload = null) -> MWATypes.Result:
 	var r = await _race_signals(authorized, authorization_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
-	else:
-		return MWATypes.Result.err(r[1], r[2])
+	return MWATypes.Result.err(r[1], r[2])
 
 ## Deauthorize and await the result.
 func deauthorize_async() -> MWATypes.Result:
@@ -532,8 +548,7 @@ func deauthorize_async() -> MWATypes.Result:
 	var r = await _race_signals(deauthorized, deauthorization_failed)
 	if r[0]:
 		return MWATypes.Result.ok(null)
-	else:
-		return MWATypes.Result.err(0, r[1])
+	return MWATypes.Result.err(0, r[1])
 
 ## Sign transactions and await the result.
 func sign_transactions_async(payloads: Array) -> MWATypes.Result:
@@ -541,8 +556,7 @@ func sign_transactions_async(payloads: Array) -> MWATypes.Result:
 	var r = await _race_signals(transactions_signed, transactions_sign_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
-	else:
-		return MWATypes.Result.err(r[1], r[2])
+	return MWATypes.Result.err(r[1], r[2])
 
 ## Sign and send transactions and await the result.
 func sign_and_send_transactions_async(payloads: Array, options = null) -> MWATypes.Result:
@@ -550,8 +564,7 @@ func sign_and_send_transactions_async(payloads: Array, options = null) -> MWATyp
 	var r = await _race_signals(transactions_sent, transactions_send_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
-	else:
-		return MWATypes.Result.err(r[1], r[2])
+	return MWATypes.Result.err(r[1], r[2])
 
 ## Sign messages and await the result.
 func sign_messages_async(messages: Array, addresses: PackedStringArray = []) -> MWATypes.Result:
@@ -559,8 +572,7 @@ func sign_messages_async(messages: Array, addresses: PackedStringArray = []) -> 
 	var r = await _race_signals(messages_signed, messages_sign_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
-	else:
-		return MWATypes.Result.err(r[1], r[2])
+	return MWATypes.Result.err(r[1], r[2])
 
 ## Get capabilities and await the result.
 func get_capabilities_async() -> MWATypes.Result:
@@ -568,8 +580,7 @@ func get_capabilities_async() -> MWATypes.Result:
 	var r = await _race_signals(capabilities_received, capabilities_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
-	else:
-		return MWATypes.Result.err(r[1], r[2])
+	return MWATypes.Result.err(r[1], r[2])
 
 
 ## Authorize and sign transactions in a single session, await the result.
@@ -578,28 +589,29 @@ func authorize_and_sign_transactions_async(payloads: Array, sign_in_payload = nu
 	var r = await _race_signals(transactions_signed, authorization_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
-	else:
-		return MWATypes.Result.err(r[1], r[2])
+	return MWATypes.Result.err(r[1], r[2])
 
 
 ## Authorize and sign+send transactions in a single session, await the result.
-func authorize_and_sign_and_send_transactions_async(payloads: Array, options = null, sign_in_payload = null) -> MWATypes.Result:
+func authorize_and_sign_and_send_transactions_async(
+		payloads: Array, options = null,
+		sign_in_payload = null) -> MWATypes.Result:
 	authorize_and_sign_and_send_transactions(payloads, options, sign_in_payload)
 	var r = await _race_signals(transactions_sent, authorization_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
-	else:
-		return MWATypes.Result.err(r[1], r[2])
+	return MWATypes.Result.err(r[1], r[2])
 
 
 ## Authorize and sign messages in a single session, await the result.
-func authorize_and_sign_messages_async(messages: Array, addresses: PackedStringArray = [], sign_in_payload = null) -> MWATypes.Result:
+func authorize_and_sign_messages_async(
+		messages: Array, addresses: PackedStringArray = [],
+		sign_in_payload = null) -> MWATypes.Result:
 	authorize_and_sign_messages(messages, addresses, sign_in_payload)
 	var r = await _race_signals(messages_signed, authorization_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
-	else:
-		return MWATypes.Result.err(r[1], r[2])
+	return MWATypes.Result.err(r[1], r[2])
 
 
 # ===================================================================

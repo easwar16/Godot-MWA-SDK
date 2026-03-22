@@ -273,8 +273,10 @@ class MWAClient {
                 walletAdapter.blockchain = chainToBlockchain(chain)
                 walletAdapter.authToken = authToken
 
-                val result = walletAdapter.transact(sender) { _ ->
-                    deauthorize(authToken)
+                val result = withTimeoutOrNull(timeoutMs) {
+                    walletAdapter.transact(sender) { _ ->
+                        deauthorize(authToken)
+                    }
                 }
 
                 cachedAuthToken = null
@@ -324,8 +326,15 @@ class MWAClient {
                     walletAdapter.authToken = token
                 }
 
-                val result = walletAdapter.transact(sender) { _ ->
-                    getCapabilities()
+                val result = withTimeoutOrNull(timeoutMs) {
+                    walletAdapter.transact(sender) { _ ->
+                        getCapabilities()
+                    }
+                }
+
+                if (result == null) {
+                    setError(MWAErrorCode.TIMEOUT, "Connection timed out. No wallet responded.")
+                    return@launch
                 }
 
                 when (result) {
@@ -379,8 +388,15 @@ class MWAClient {
                 walletAdapter.authToken = authToken
                 walletAdapter.blockchain = chainToBlockchain(chain)
 
-                val result = walletAdapter.transact(sender) { _ ->
-                    signTransactions(payloads)
+                val result = withTimeoutOrNull(timeoutMs) {
+                    walletAdapter.transact(sender) { _ ->
+                        signTransactions(payloads)
+                    }
+                }
+
+                if (result == null) {
+                    setError(MWAErrorCode.TIMEOUT, "Connection timed out. No wallet responded.")
+                    return@launch
                 }
 
                 when (result) {
@@ -455,8 +471,15 @@ class MWAClient {
                 }
                 val params = TransactionParams(minContextSlot, commitment, skipPreflight, maxRetries, null)
 
-                val result = walletAdapter.transact(sender) { _ ->
-                    signAndSendTransactions(payloads, params)
+                val result = withTimeoutOrNull(timeoutMs) {
+                    walletAdapter.transact(sender) { _ ->
+                        signAndSendTransactions(payloads, params)
+                    }
+                }
+
+                if (result == null) {
+                    setError(MWAErrorCode.TIMEOUT, "Connection timed out. No wallet responded.")
+                    return@launch
                 }
 
                 when (result) {
@@ -512,8 +535,15 @@ class MWAClient {
                 walletAdapter.blockchain = chainToBlockchain(chain)
                 walletAdapter.authToken = authToken
 
-                val result = walletAdapter.transact(sender) { _ ->
-                    signMessagesDetached(messages, addresses)
+                val result = withTimeoutOrNull(timeoutMs) {
+                    walletAdapter.transact(sender) { _ ->
+                        signMessagesDetached(messages, addresses)
+                    }
+                }
+
+                if (result == null) {
+                    setError(MWAErrorCode.TIMEOUT, "Connection timed out. No wallet responded.")
+                    return@launch
                 }
 
                 when (result) {

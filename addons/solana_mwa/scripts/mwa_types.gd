@@ -41,7 +41,9 @@ class Result:
 	var error_code: int
 	var error_message: String
 
-	func _init(p_success: bool = false, p_data: Variant = null, p_error_code: int = 0, p_error_message: String = "") -> void:
+	func _init(
+			p_success: bool = false, p_data: Variant = null,
+			p_error_code: int = 0, p_error_message: String = "") -> void:
 		success = p_success
 		data = p_data
 		error_code = p_error_code
@@ -62,7 +64,11 @@ class Account:
 	var chains: PackedStringArray
 	var features: PackedStringArray
 
-	func _init(p_address: String = "", p_public_key: PackedByteArray = [], p_label: String = "", p_icon: String = "", p_chains: PackedStringArray = [], p_features: PackedStringArray = []) -> void:
+	func _init(
+			p_address: String = "", p_public_key: PackedByteArray = [],
+			p_label: String = "", p_icon: String = "",
+			p_chains: PackedStringArray = [],
+			p_features: PackedStringArray = []) -> void:
 		address = p_address
 		public_key = p_public_key
 		label = p_label
@@ -134,7 +140,10 @@ class DappIdentity:
 	var icon: String
 	var name: String
 
-	func _init(p_name: String = "Godot dApp", p_uri: String = "https://solana.com", p_icon: String = "icon.png") -> void:
+	func _init(
+			p_name: String = "Godot dApp",
+			p_uri: String = "https://solana.com",
+			p_icon: String = "icon.png") -> void:
 		name = p_name
 		uri = p_uri
 		icon = p_icon

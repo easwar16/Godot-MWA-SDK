@@ -1,12 +1,26 @@
 extends Control
 ## Guided SDK Playground — step-based MWA demo with progressive unlocking.
 
+# --- Colors ---
+const C_GREEN := Color(0.0, 0.83, 0.67)
+const C_PURPLE := Color(0.6, 0.27, 1.0)
+const C_BLUE := Color(0.29, 0.62, 1.0)
+const C_RED := Color(1.0, 0.42, 0.42)
+const C_AMBER := Color(0.91, 0.66, 0.22)
+const C_TEXT := Color(0.91, 0.91, 0.94)
+const C_MUTED := Color(0.45, 0.45, 0.56)
+
+# --- State ---
+var adapter: MobileWalletAdapter
+var _log_visible := false
+var _button_labels := {}  # Stores original text for loading states
+var _toast_tween: Tween
+
 # --- Step Cards ---
 @onready var step1_card: PanelContainer = %Step1Card
 @onready var step2_card: PanelContainer = %Step2Card
 @onready var step3_card: PanelContainer = %Step3Card
 @onready var step4_card: PanelContainer = %Step4Card
-@onready var log_card: PanelContainer = %LogCard
 
 # --- Step Content (locked/unlocked toggling) ---
 @onready var step2_content: VBoxContainer = %Step2Content
@@ -41,31 +55,13 @@ extends Control
 @onready var reset_btn: Button = %ResetBtn
 
 # --- Log ---
+@onready var log_toggle_btn: Button = %LogToggleBtn
+@onready var log_panel: PanelContainer = %LogPanel
 @onready var output_log: RichTextLabel = %OutputLog
-@onready var clear_btn: Button = %ClearBtn
 
 # --- Toast ---
-@onready var toast_margin: MarginContainer = %ToastMargin
 @onready var toast_panel: PanelContainer = %ToastPanel
 @onready var toast_label: Label = %ToastLabel
-
-# --- State ---
-var adapter: MobileWalletAdapter
-var _button_labels := {}
-var _toast_tween: Tween
-var _connect_btn_normal_style: StyleBox
-var _prev_step2_locked := true
-var _prev_step3_locked := true
-var _prev_step4_locked := true
-
-# --- Colors ---
-const C_GREEN := Color(0.0, 0.83, 0.67)
-const C_PURPLE := Color(0.6, 0.27, 1.0)
-const C_BLUE := Color(0.29, 0.62, 1.0)
-const C_RED := Color(1.0, 0.42, 0.42)
-const C_AMBER := Color(0.91, 0.66, 0.22)
-const C_TEXT := Color(0.91, 0.91, 0.94)
-const C_MUTED := Color(0.45, 0.45, 0.56)
 
 
 func _ready() -> void:
@@ -79,17 +75,15 @@ func _ready() -> void:
 	adapter.debug_logging = true
 	adapter.debug_log.connect(func(msg): _log("[color=#555570][DEBUG] %s[/color]" % msg))
 
-	_connect_btn_normal_style = connect_btn.get_theme_stylebox("normal")
-
 	_connect_adapter_signals()
 	_wire_buttons()
 	_setup_cluster_selector()
 	_setup_toast()
+	_setup_log()
 	_update_steps()
-	_play_entrance_animation()
 
 	if adapter.auth_cache.has_authorization():
-		_log("Cached session found. Tap [b]Reconnect[/b] to restore.")
+		_log("Cached session found.")
 
 
 func _connect_adapter_signals() -> void:
@@ -119,14 +113,7 @@ func _wire_buttons() -> void:
 	reconnect_btn.pressed.connect(_on_reconnect)
 	deauth_btn.pressed.connect(_on_deauthorize)
 	reset_btn.pressed.connect(_on_reset_session)
-	clear_btn.pressed.connect(_on_clear_log)
-
-	# Wire press animations to all interactive buttons.
-	for btn in [connect_btn, siws_btn, sign_tx_btn, sign_send_btn,
-			sign_msg_btn, features_btn, disconnect_btn, reconnect_btn,
-			deauth_btn, reset_btn, clear_btn]:
-		btn.button_down.connect(_animate_button_press.bind(btn))
-		btn.button_up.connect(_animate_button_release.bind(btn))
+	log_toggle_btn.pressed.connect(_on_toggle_log)
 
 
 func _setup_cluster_selector() -> void:
@@ -139,51 +126,21 @@ func _setup_cluster_selector() -> void:
 func _setup_toast() -> void:
 	toast_panel.visible = false
 	toast_panel.modulate.a = 0.0
-	var safe := DisplayServer.get_display_safe_area()
-	var screen := DisplayServer.screen_get_size()
-	if screen.y > 0:
-		var safe_top := int(safe.position.y * get_viewport().get_visible_rect().size.y / screen.y)
-		if safe_top > 0:
-			toast_margin.add_theme_constant_override("margin_top", safe_top + 6)
+	# Push toast below the notch / punch hole.
+	var safe_area := DisplayServer.get_display_safe_area()
+	var screen_size := DisplayServer.screen_get_size()
+	var scale_y := get_viewport().get_visible_rect().size.y / float(screen_size.y)
+	var safe_top := int(safe_area.position.y * scale_y)
+	if safe_top < 20:
+		safe_top = 20
+	var toast_margin_node := toast_panel.get_parent() as MarginContainer
+	toast_margin_node.add_theme_constant_override("margin_top", safe_top)
 
 
-# ===================================================================
-# ENTRANCE ANIMATION
-# ===================================================================
-
-func _play_entrance_animation() -> void:
-	var cards: Array[Control] = [step1_card, step2_card, step3_card, step4_card, log_card]
-	for card in cards:
-		card.modulate.a = 0.0
-		card.position.y += 12.0
-
-	var tw := create_tween()
-	tw.set_ease(Tween.EASE_OUT)
-	tw.set_trans(Tween.TRANS_CUBIC)
-
-	for i in range(cards.size()):
-		var card := cards[i]
-		var target_y := card.position.y - 12.0
-		tw.tween_property(card, "modulate:a", 1.0, 0.3).set_delay(i * 0.06)
-		tw.parallel().tween_property(card, "position:y", target_y, 0.3).set_delay(i * 0.06)
-
-
-# ===================================================================
-# BUTTON PRESS ANIMATIONS
-# ===================================================================
-
-func _animate_button_press(btn: Button) -> void:
-	var tw := create_tween()
-	tw.set_ease(Tween.EASE_OUT)
-	tw.set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(btn, "scale", Vector2(0.97, 0.97), 0.08)
-
-
-func _animate_button_release(btn: Button) -> void:
-	var tw := create_tween()
-	tw.set_ease(Tween.EASE_OUT)
-	tw.set_trans(Tween.TRANS_ELASTIC)
-	tw.tween_property(btn, "scale", Vector2.ONE, 0.35)
+func _setup_log() -> void:
+	log_panel.visible = true
+	_log_visible = true
+	log_toggle_btn.text = "Hide Output Log"
 
 
 # ===================================================================
@@ -191,57 +148,28 @@ func _animate_button_release(btn: Button) -> void:
 # ===================================================================
 
 func _update_steps() -> void:
-	var authorized := adapter.is_authorized()
+	var connected := adapter.is_wallet_connected()
 	var busy := adapter.is_busy()
 
-	# Step 1: Always enabled.
+	# Step 1: Disable connect only when actively connected or busy.
 	_update_status_indicator()
-	connect_btn.disabled = busy
-	if authorized:
-		connect_btn.text = "Disconnect"
-		connect_btn.add_theme_color_override("font_color", C_RED)
-		connect_btn.add_theme_color_override("font_hover_color", C_RED)
-		var outline := StyleBoxFlat.new()
-		outline.bg_color = Color.TRANSPARENT
-		outline.border_color = C_RED
-		outline.set_border_width_all(1)
-		outline.set_corner_radius_all(10)
-		outline.content_margin_left = 12.0
-		outline.content_margin_top = 12.0
-		outline.content_margin_right = 12.0
-		outline.content_margin_bottom = 12.0
-		connect_btn.add_theme_stylebox_override("normal", outline)
-		connect_btn.add_theme_stylebox_override("hover", outline)
-	else:
-		connect_btn.text = "Connect Wallet"
-		connect_btn.add_theme_color_override("font_color", Color(0.02, 0.02, 0.03))
-		connect_btn.add_theme_color_override("font_hover_color", Color(0.02, 0.02, 0.03))
-		connect_btn.add_theme_color_override("font_pressed_color", Color(0.02, 0.02, 0.03))
-		connect_btn.add_theme_stylebox_override("normal", _connect_btn_normal_style)
-		connect_btn.add_theme_stylebox_override("hover", connect_btn.get_theme_stylebox("hover"))
-		connect_btn.add_theme_stylebox_override("pressed", connect_btn.get_theme_stylebox("pressed"))
+	connect_btn.disabled = busy or connected
 
 	# Step 2: Unlock after connected.
-	var s2_locked := !authorized
-	_set_step_locked(step2_content, step2_hint, s2_locked)
-	if _prev_step2_locked and not s2_locked:
-		_animate_step_unlock(step2_card)
-	_prev_step2_locked = s2_locked
+	_set_step_locked(step2_content, step2_hint, !connected)
 
 	# Step 3: Unlock after authorized.
-	var s3_locked := !authorized
-	_set_step_locked(step3_content, step3_hint, s3_locked)
-	if _prev_step3_locked and not s3_locked:
-		_animate_step_unlock(step3_card)
-	_prev_step3_locked = s3_locked
+	_set_step_locked(step3_content, step3_hint, !connected)
 
 	# Step 4: Unlock after connected (need something to manage).
-	var has_session := authorized or adapter.auth_cache.has_authorization()
-	var s4_locked := !has_session
-	_set_step_locked(step4_content, step4_hint, s4_locked)
-	if _prev_step4_locked and not s4_locked:
-		_animate_step_unlock(step4_card)
-	_prev_step4_locked = s4_locked
+	var has_session := connected or adapter.auth_cache.has_authorization()
+	_set_step_locked(step4_content, step4_hint, !has_session)
+
+	# Reconnect only makes sense when disconnected but cache exists.
+	reconnect_btn.visible = !connected and adapter.auth_cache.has_authorization()
+	# Disconnect/deauth only when actively connected.
+	disconnect_btn.disabled = !connected
+	deauth_btn.disabled = !connected
 
 	# Wallet address.
 	var acc = adapter.get_account()
@@ -268,18 +196,7 @@ func _set_step_locked(content: VBoxContainer, hint: Label, locked: bool) -> void
 					btn.disabled = locked
 
 
-func _animate_step_unlock(card: PanelContainer) -> void:
-	var tw := create_tween()
-	tw.set_ease(Tween.EASE_OUT)
-	tw.set_trans(Tween.TRANS_CUBIC)
-	# Brief scale pulse to draw attention.
-	card.pivot_offset = card.size / 2.0
-	tw.tween_property(card, "scale", Vector2(1.015, 1.015), 0.15)
-	tw.tween_property(card, "scale", Vector2.ONE, 0.25)
-
-
 func _update_status_indicator() -> void:
-	var prev_text := status_label.text
 	match adapter.state:
 		MWATypes.ConnectionState.DISCONNECTED:
 			status_dot.text = "\u25CF"
@@ -306,19 +223,6 @@ func _update_status_indicator() -> void:
 			status_dot.add_theme_color_override("font_color", C_AMBER)
 			status_label.text = "Deauthorizing..."
 			status_label.add_theme_color_override("font_color", C_AMBER)
-
-	# Pulse the status dot when state changes.
-	if status_label.text != prev_text:
-		_pulse_status_dot()
-
-
-func _pulse_status_dot() -> void:
-	var tw := create_tween()
-	tw.set_ease(Tween.EASE_OUT)
-	tw.set_trans(Tween.TRANS_CUBIC)
-	status_dot.pivot_offset = status_dot.size / 2.0
-	tw.tween_property(status_dot, "scale", Vector2(1.6, 1.6), 0.12)
-	tw.tween_property(status_dot, "scale", Vector2.ONE, 0.2)
 
 
 # ===================================================================
@@ -373,12 +277,7 @@ func _show_toast(text: String, is_error: bool = false) -> void:
 		_toast_tween.kill()
 
 	_toast_tween = create_tween()
-	_toast_tween.set_ease(Tween.EASE_OUT)
-	_toast_tween.set_trans(Tween.TRANS_CUBIC)
-	# Slide in from top.
-	toast_panel.position.y = -20.0
-	_toast_tween.tween_property(toast_panel, "modulate:a", 1.0, 0.25)
-	_toast_tween.parallel().tween_property(toast_panel, "position:y", 0.0, 0.25)
+	_toast_tween.tween_property(toast_panel, "modulate:a", 1.0, 0.2)
 	_toast_tween.tween_interval(3.0)
 	_toast_tween.tween_property(toast_panel, "modulate:a", 0.0, 0.4)
 	_toast_tween.tween_callback(func(): toast_panel.visible = false)
@@ -388,9 +287,10 @@ func _show_toast(text: String, is_error: bool = false) -> void:
 # LOG PANEL
 # ===================================================================
 
-func _on_clear_log() -> void:
-	output_log.clear()
-	_log("[color=#555570]Log cleared.[/color]")
+func _on_toggle_log() -> void:
+	_log_visible = not _log_visible
+	log_panel.visible = _log_visible
+	log_toggle_btn.text = "Hide Output Log" if _log_visible else "Show Output Log"
 
 
 func _log(msg: String) -> void:
@@ -404,15 +304,10 @@ func _log(msg: String) -> void:
 # ===================================================================
 
 func _on_connect() -> void:
-	if adapter.is_authorized():
-		_set_loading(connect_btn, "Disconnecting...")
-		_log("Disconnecting...")
-		adapter.disconnect_wallet()
-	else:
-		adapter.cluster = cluster_option.get_selected_id() as MWATypes.Cluster
-		_set_loading(connect_btn, "Connecting...")
-		_log("Connecting on %s..." % MWATypes.cluster_to_chain(adapter.cluster))
-		adapter.authorize()
+	adapter.cluster = cluster_option.get_selected_id() as MWATypes.Cluster
+	_set_loading(connect_btn, "Connecting...")
+	_log("Connecting on %s..." % MWATypes.cluster_to_chain(adapter.cluster))
+	adapter.authorize()
 
 
 func _on_sign_in_with_solana() -> void:
@@ -429,26 +324,147 @@ func _on_sign_in_with_solana() -> void:
 	adapter.authorize(siws)
 
 
+func _get_rpc_url() -> String:
+	match adapter.cluster:
+		MWATypes.Cluster.DEVNET:
+			return "https://api.devnet.solana.com"
+		MWATypes.Cluster.TESTNET:
+			return "https://api.testnet.solana.com"
+		_:
+			return "https://api.mainnet-beta.solana.com"
+
+
+func _fetch_recent_blockhash() -> PackedByteArray:
+	var http := HTTPRequest.new()
+	add_child(http)
+	var body := JSON.stringify({
+		"jsonrpc": "2.0", "id": 1,
+		"method": "getLatestBlockhash",
+		"params": [{"commitment": "finalized"}]
+	})
+	var headers := ["Content-Type: application/json"]
+	var err := http.request(
+		_get_rpc_url(), headers, HTTPClient.METHOD_POST, body)
+	if err != OK:
+		http.queue_free()
+		return PackedByteArray()
+	var result = await http.request_completed
+	http.queue_free()
+	var json := JSON.new()
+	if json.parse(result[3].get_string_from_utf8()) != OK:
+		return PackedByteArray()
+	var hash_b58: String = json.data["result"]["value"]["blockhash"]
+	return _base58_decode(hash_b58)
+
+
+func _base58_decode(input: String) -> PackedByteArray:
+	const ALPHABET := "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+	var result := PackedByteArray()
+	var big := []  # big-endian byte array arithmetic
+	for c in input:
+		var carry := ALPHABET.find(c)
+		if carry < 0:
+			return PackedByteArray()
+		for i in range(big.size()):
+			carry += big[i] * 58
+			big[i] = carry % 256
+			carry = carry / 256
+		while carry > 0:
+			big.append(carry % 256)
+			carry = carry / 256
+	# Count leading '1's = leading zero bytes
+	for c in input:
+		if c != "1":
+			break
+		result.append(0)
+	# Append big in reverse
+	for i in range(big.size() - 1, -1, -1):
+		result.append(big[i])
+	return result
+
+
+func _build_memo_tx(blockhash: PackedByteArray) -> PackedByteArray:
+	var acc = adapter.get_account()
+	if acc == null:
+		return PackedByteArray()
+
+	var signer_pubkey := Marshalls.base64_to_raw(acc.address)
+	if signer_pubkey.size() != 32:
+		return PackedByteArray()
+
+	# Memo program ID: MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr
+	var memo_program := Marshalls.base64_to_raw(
+		"BUpTWpkpIQZNJOhxYNo4fHw1td28kruB5B+oQEEFRI0=")
+
+	var memo_data := "Hello from Godot MWA SDK!".to_utf8_buffer()
+
+	var tx := PackedByteArray()
+
+	# --- Signatures section ---
+	tx.append(0x01)  # 1 signature (compact-u16)
+	var zero_sig := PackedByteArray()
+	zero_sig.resize(64)  # placeholder for wallet to fill
+	tx.append_array(zero_sig)
+
+	# --- Message section ---
+	tx.append(0x01)  # 1 required signature (fee payer)
+	tx.append(0x00)  # 0 read-only signed
+	tx.append(0x01)  # 1 read-only unsigned (memo program)
+
+	tx.append(0x02)  # 2 accounts
+	tx.append_array(signer_pubkey)  # account 0: signer/fee payer
+	tx.append_array(memo_program)   # account 1: memo program
+
+	tx.append_array(blockhash)  # recent blockhash from RPC
+
+	tx.append(0x01)  # 1 instruction
+
+	# Instruction: memo
+	tx.append(0x01)  # program_id_index = 1 (memo program)
+	tx.append(0x01)  # 1 account index
+	tx.append(0x00)  # account index 0 (signer)
+	tx.append(memo_data.size())  # data length
+	tx.append_array(memo_data)   # memo text
+
+	return tx
+
+
 func _on_sign_transaction() -> void:
-	var dummy_tx := PackedByteArray()
-	dummy_tx.resize(64)
-	for i in range(64):
-		dummy_tx[i] = randi() % 256
 	_set_loading(sign_tx_btn, "Signing...")
-	_log("Signing transaction (dummy bytes)...")
-	adapter.sign_transactions([dummy_tx] as Array)
+	_log("Fetching blockhash from %s..." % _get_rpc_url())
+	var blockhash := await _fetch_recent_blockhash()
+	if blockhash.size() != 32:
+		_show_toast("Failed to fetch blockhash", true)
+		_log("[color=#ff6b6b]Blockhash fetch failed[/color]")
+		_restore_button(sign_tx_btn)
+		return
+	var tx := _build_memo_tx(blockhash)
+	if tx.is_empty():
+		_show_toast("No account — authorize first", true)
+		_restore_button(sign_tx_btn)
+		return
+	_log("Signing memo transaction...")
+	adapter.sign_transactions([tx] as Array)
 
 
 func _on_sign_and_send() -> void:
-	var dummy_tx := PackedByteArray()
-	dummy_tx.resize(64)
-	for i in range(64):
-		dummy_tx[i] = randi() % 256
+	_set_loading(sign_send_btn, "Sending...")
+	_log("Fetching blockhash from %s..." % _get_rpc_url())
+	var blockhash := await _fetch_recent_blockhash()
+	if blockhash.size() != 32:
+		_show_toast("Failed to fetch blockhash", true)
+		_log("[color=#ff6b6b]Blockhash fetch failed[/color]")
+		_restore_button(sign_send_btn)
+		return
+	var tx := _build_memo_tx(blockhash)
+	if tx.is_empty():
+		_show_toast("No account — authorize first", true)
+		_restore_button(sign_send_btn)
+		return
 	var options := MWATypes.SendOptions.new()
 	options.commitment = "confirmed"
-	_set_loading(sign_send_btn, "Sending...")
-	_log("Sign & send transaction (dummy bytes)...")
-	adapter.sign_and_send_transactions([dummy_tx] as Array, options)
+	_log("Sign & send memo transaction...")
+	adapter.sign_and_send_transactions([tx] as Array, options)
 
 
 func _on_sign_message() -> void:
@@ -554,7 +570,8 @@ func _on_tx_signed(signed_payloads: Array) -> void:
 
 
 func _on_tx_sign_failed(error_code: int, error_message: String) -> void:
-	var msg := error_message if error_message != "" and error_message != "null" else "Wallet rejected (demo uses dummy bytes)"
+	var fallback := "Wallet rejected (demo uses dummy bytes)"
+	var msg := error_message if error_message != "" and error_message != "null" else fallback
 	_show_toast("Sign failed: %s" % msg, true)
 	_log("[color=#ff6b6b]Sign failed[/color] (%d): %s" % [error_code, msg])
 	_update_steps()
@@ -570,7 +587,8 @@ func _on_tx_sent(signatures: Array) -> void:
 
 
 func _on_tx_send_failed(error_code: int, error_message: String) -> void:
-	var msg := error_message if error_message != "" and error_message != "null" else "Wallet rejected (demo uses dummy bytes)"
+	var fallback := "Wallet rejected (demo uses dummy bytes)"
+	var msg := error_message if error_message != "" and error_message != "null" else fallback
 	_show_toast("Send failed: %s" % msg, true)
 	_log("[color=#ff6b6b]Send failed[/color] (%d): %s" % [error_code, msg])
 	_update_steps()
