@@ -28,3 +28,4 @@ SDK/
 # Export presets and credentials (user-specific)
 export_presets.cfg
 .godot/export_credentials.cfg
+docs/screenshot_app_running.png

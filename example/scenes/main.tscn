@@ -9,62 +9,62 @@ bg_color = Color(0.055, 0.055, 0.075, 1)
 bg_color = Color(0.075, 0.075, 0.1, 1)
 border_width_bottom = 1
 border_color = Color(0.15, 0.15, 0.2, 1)
-content_margin_left = 24.0
-content_margin_top = 72.0
-content_margin_right = 24.0
-content_margin_bottom = 24.0
+content_margin_left = 14.0
+content_margin_top = 40.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
 
 [sub_resource type="StyleBoxFlat" id="c1"]
 bg_color = Color(0.09, 0.09, 0.12, 1)
 border_width_left = 4
 border_color = Color(0.0, 0.83, 0.67, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-content_margin_left = 28.0
-content_margin_top = 24.0
-content_margin_right = 28.0
-content_margin_bottom = 24.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
 
 [sub_resource type="StyleBoxFlat" id="c2"]
 bg_color = Color(0.09, 0.09, 0.12, 1)
 border_width_left = 4
 border_color = Color(0.6, 0.27, 1.0, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-content_margin_left = 28.0
-content_margin_top = 24.0
-content_margin_right = 28.0
-content_margin_bottom = 24.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
 
 [sub_resource type="StyleBoxFlat" id="c3"]
 bg_color = Color(0.09, 0.09, 0.12, 1)
 border_width_left = 4
 border_color = Color(0.29, 0.62, 1.0, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-content_margin_left = 28.0
-content_margin_top = 24.0
-content_margin_right = 28.0
-content_margin_bottom = 24.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
 
 [sub_resource type="StyleBoxFlat" id="c4"]
 bg_color = Color(0.09, 0.09, 0.12, 1)
 border_width_left = 4
 border_color = Color(0.91, 0.66, 0.22, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-content_margin_left = 28.0
-content_margin_top = 24.0
-content_margin_right = 28.0
-content_margin_bottom = 24.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
 
 [sub_resource type="StyleBoxFlat" id="bg1"]
 bg_color = Color(0.0, 0.83, 0.67, 1)
@@ -72,10 +72,10 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 20.0
-content_margin_top = 16.0
-content_margin_right = 20.0
-content_margin_bottom = 16.0
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxFlat" id="bp1"]
 bg_color = Color(0.6, 0.27, 1.0, 1)
@@ -83,10 +83,10 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 20.0
-content_margin_top = 16.0
-content_margin_right = 20.0
-content_margin_bottom = 16.0
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxFlat" id="bb1"]
 bg_color = Color(0.12, 0.12, 0.18, 1)
@@ -99,10 +99,10 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 20.0
-content_margin_top = 16.0
-content_margin_right = 20.0
-content_margin_bottom = 16.0
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxFlat" id="bo1"]
 bg_color = Color(0.12, 0.12, 0.18, 1)
@@ -115,10 +115,10 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 20.0
-content_margin_top = 16.0
-content_margin_right = 20.0
-content_margin_bottom = 16.0
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxFlat" id="br1"]
 bg_color = Color(0.18, 0.08, 0.08, 1)
@@ -131,10 +131,10 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 20.0
-content_margin_top = 16.0
-content_margin_right = 20.0
-content_margin_bottom = 16.0
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxFlat" id="brs"]
 bg_color = Color(0.09, 0.09, 0.12, 1)
@@ -147,10 +147,10 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 20.0
-content_margin_top = 16.0
-content_margin_right = 20.0
-content_margin_bottom = 16.0
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxFlat" id="lgp"]
 bg_color = Color(0.035, 0.035, 0.05, 1)
@@ -159,27 +159,27 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.15, 0.15, 0.2, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-content_margin_left = 16.0
-content_margin_top = 14.0
-content_margin_right = 16.0
-content_margin_bottom = 14.0
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
 
 [sub_resource type="StyleBoxFlat" id="tst"]
 bg_color = Color(0.05, 0.12, 0.08, 0.95)
 border_width_left = 4
 border_color = Color(0.0, 0.83, 0.67, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-content_margin_left = 16.0
-content_margin_top = 12.0
-content_margin_right = 16.0
-content_margin_bottom = 12.0
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxEmpty" id="sep"]
 
@@ -221,19 +221,19 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Solana MWA SDK"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 10
 
 [node name="Subtitle" type="Label" parent="Bg/MainVBox/Header/HBox/TitleCol"]
 layout_mode = 2
 text = "Test wallet adapter flows interactively"
 theme_override_colors/font_color = Color(0.6, 0.6, 0.7, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 10
 
 [node name="ClusterOption" type="OptionButton" parent="Bg/MainVBox/Header/HBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 10
 
 [node name="Scroll" type="ScrollContainer" parent="Bg/MainVBox"]
 layout_mode = 2
@@ -243,15 +243,15 @@ horizontal_scroll_mode = 0
 [node name="Margin" type="MarginContainer" parent="Bg/MainVBox/Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 32
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 16
 
 [node name="Steps" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 24
+theme_override_constants/separation = 6
 
 ; ── STEP 1: CONNECT WALLET ──
 
@@ -262,17 +262,17 @@ theme_override_styles/panel = SubResource("c1")
 
 [node name="V" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 4
 
 [node name="HeaderRow" type="HBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="Num" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V/HeaderRow"]
 layout_mode = 2
 text = "1"
 theme_override_colors/font_color = Color(0.0, 0.83, 0.67, 1)
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 10
 
 [node name="TitleCol" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V/HeaderRow"]
 layout_mode = 2
@@ -283,40 +283,40 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Connect Wallet"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 8
 
 [node name="Desc" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V/HeaderRow/TitleCol"]
 layout_mode = 2
 text = "Link your MWA-compatible wallet to begin"
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 10
 
 [node name="ConnectBtn" type="Button" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.02, 0.02, 0.03, 1)
 theme_override_colors/font_hover_color = Color(0.02, 0.02, 0.03, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 12
 text = "Connect Wallet"
 theme_override_styles/normal = SubResource("bg1")
 
 [node name="StatusRow" type="HBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 4
 
 [node name="StatusDot" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V/StatusRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "●"
 theme_override_colors/font_color = Color(1.0, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 8
 
 [node name="StatusLabel" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step1Card/V/StatusRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Disconnected"
 theme_override_colors/font_color = Color(1.0, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 10
 
 ; ── STEP 2: AUTHORIZE SESSION ──
 
@@ -327,17 +327,17 @@ theme_override_styles/panel = SubResource("c2")
 
 [node name="V" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step2Card"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 4
 
 [node name="HeaderRow" type="HBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step2Card/V"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="Num" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step2Card/V/HeaderRow"]
 layout_mode = 2
 text = "2"
 theme_override_colors/font_color = Color(0.6, 0.27, 1.0, 1)
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 10
 
 [node name="TitleCol" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step2Card/V/HeaderRow"]
 layout_mode = 2
@@ -348,24 +348,24 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Authorize Session"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 8
 
 [node name="Desc" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step2Card/V/HeaderRow/TitleCol"]
 layout_mode = 2
 text = "Verify identity with Sign In With Solana"
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 10
 
 [node name="Step2Content" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step2Card/V"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="SIWSBtn" type="Button" parent="Bg/MainVBox/Scroll/Margin/Steps/Step2Card/V/Step2Content"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 12
 text = "Sign In With Solana"
 theme_override_styles/normal = SubResource("bp1")
 
@@ -374,7 +374,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "No wallet connected yet"
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 10
 autowrap_mode = 2
 text_overrun_behavior = 3
 
@@ -383,7 +383,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Connect wallet first to enable"
 theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 9
 
 ; ── STEP 3: WALLET ACTIONS ──
 
@@ -394,17 +394,17 @@ theme_override_styles/panel = SubResource("c3")
 
 [node name="V" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 4
 
 [node name="HeaderRow" type="HBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="Num" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/HeaderRow"]
 layout_mode = 2
 text = "3"
 theme_override_colors/font_color = Color(0.29, 0.62, 1.0, 1)
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 10
 
 [node name="TitleCol" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/HeaderRow"]
 layout_mode = 2
@@ -415,29 +415,29 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Wallet Actions"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 8
 
 [node name="Desc" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/HeaderRow/TitleCol"]
 layout_mode = 2
 text = "Sign transactions and messages"
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 10
 
 [node name="Step3Content" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="Row1" type="HBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/Step3Content"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="SignTxBtn" type="Button" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/Step3Content/Row1"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.29, 0.62, 1.0, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 11
 text = "Sign Transaction"
 theme_override_styles/normal = SubResource("bb1")
 
@@ -446,20 +446,20 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.29, 0.62, 1.0, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 11
 text = "Sign & Send"
 theme_override_styles/normal = SubResource("bb1")
 
 [node name="Row2" type="HBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/Step3Content"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="SignMsgBtn" type="Button" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/Step3Content/Row2"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.29, 0.62, 1.0, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 11
 text = "Sign Message"
 theme_override_styles/normal = SubResource("bb1")
 
@@ -468,7 +468,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.29, 0.62, 1.0, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 11
 text = "Check Features"
 theme_override_styles/normal = SubResource("bb1")
 
@@ -477,7 +477,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Authorize session to continue"
 theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 9
 
 ; ── STEP 4: SESSION MANAGEMENT ──
 
@@ -488,17 +488,17 @@ theme_override_styles/panel = SubResource("c4")
 
 [node name="V" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 4
 
 [node name="HeaderRow" type="HBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="Num" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V/HeaderRow"]
 layout_mode = 2
 text = "4"
 theme_override_colors/font_color = Color(0.91, 0.66, 0.22, 1)
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 10
 
 [node name="TitleCol" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V/HeaderRow"]
 layout_mode = 2
@@ -509,29 +509,29 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Session Management"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 8
 
 [node name="Desc" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V/HeaderRow/TitleCol"]
 layout_mode = 2
 text = "Manage connection lifecycle"
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 10
 
 [node name="Step4Content" type="VBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="Row1" type="HBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V/Step4Content"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="ReconnectBtn" type="Button" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V/Step4Content/Row1"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.91, 0.66, 0.22, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 11
 text = "Reconnect"
 theme_override_styles/normal = SubResource("bo1")
 
@@ -540,20 +540,20 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1.0, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 11
 text = "Disconnect"
 theme_override_styles/normal = SubResource("br1")
 
 [node name="Row2" type="HBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V/Step4Content"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="DeauthBtn" type="Button" parent="Bg/MainVBox/Scroll/Margin/Steps/Step4Card/V/Step4Content/Row2"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1.0, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 11
 text = "Deauthorize"
 theme_override_styles/normal = SubResource("br1")
 
@@ -562,7 +562,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.55, 0.55, 0.65, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 11
 text = "Reset Session"
 theme_override_styles/normal = SubResource("brs")
 
@@ -571,7 +571,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Connect wallet to enable"
 theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 9
 
 ; ── OUTPUT LOG (COLLAPSIBLE) ──
 
@@ -583,7 +583,7 @@ theme_override_styles/separator = SubResource("sep")
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.65, 0.75, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 10
 text = "Show Output Log"
 theme_override_styles/normal = SubResource("brs")
 
@@ -591,14 +591,14 @@ theme_override_styles/normal = SubResource("brs")
 unique_name_in_owner = true
 layout_mode = 2
 visible = false
-custom_minimum_size = Vector2(0, 240)
+custom_minimum_size = Vector2(0, 120)
 theme_override_styles/panel = SubResource("lgp")
 
 [node name="OutputLog" type="RichTextLabel" parent="Bg/MainVBox/Scroll/Margin/Steps/LogPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/default_color = Color(0.65, 0.68, 0.75, 1)
-theme_override_font_sizes/normal_font_size = 15
+theme_override_font_sizes/normal_font_size = 8
 bbcode_enabled = true
 text = ""
 scroll_following = true
@@ -609,7 +609,7 @@ scroll_following = true
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 80.0
+offset_bottom = 44.0
 grow_horizontal = 2
 mouse_filter = 2
 
@@ -621,9 +621,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 16
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 0
 
 [node name="ToastPanel" type="PanelContainer" parent="ToastAnchor/ToastMargin"]
@@ -638,5 +638,5 @@ theme_override_styles/panel = SubResource("tst")
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.0, 0.83, 0.67, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 10
 autowrap_mode = 2
