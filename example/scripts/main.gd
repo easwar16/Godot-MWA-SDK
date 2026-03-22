@@ -260,19 +260,19 @@ func _update_ui() -> void:
 	match adapter.state:
 		MWATypes.ConnectionState.DISCONNECTED:
 			status_label.text = "Disconnected"
-			status_label.modulate = Color.RED
+			status_label.add_theme_color_override("font_color", Color(1, 0.35, 0.35, 1))
 		MWATypes.ConnectionState.CONNECTING:
 			status_label.text = "Connecting..."
-			status_label.modulate = Color.YELLOW
+			status_label.add_theme_color_override("font_color", Color(1, 0.85, 0.3, 1))
 		MWATypes.ConnectionState.CONNECTED:
 			status_label.text = "Connected"
-			status_label.modulate = Color.GREEN
+			status_label.add_theme_color_override("font_color", Color(0.0, 0.9, 0.6, 1))
 		MWATypes.ConnectionState.SIGNING:
 			status_label.text = "Signing..."
-			status_label.modulate = Color.CYAN
+			status_label.add_theme_color_override("font_color", Color(0.6, 0.33, 1.0, 1))
 		MWATypes.ConnectionState.DEAUTHORIZING:
 			status_label.text = "Deauthorizing..."
-			status_label.modulate = Color.YELLOW
+			status_label.add_theme_color_override("font_color", Color(1, 0.85, 0.3, 1))
 
 	if busy:
 		status_label.text += " (working...)"
@@ -281,8 +281,10 @@ func _update_ui() -> void:
 	var acc = adapter.get_account()
 	if acc != null:
 		pubkey_label.text = acc.address
+		pubkey_label.add_theme_color_override("font_color", Color(0.7, 0.75, 0.8, 1))
 	else:
-		pubkey_label.text = "Not connected"
+		pubkey_label.text = "No wallet connected"
+		pubkey_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.6, 1))
 
 	# Button states.
 	connect_btn.disabled = busy or adapter.state == MWATypes.ConnectionState.CONNECTING

@@ -1,6 +1,195 @@
-[gd_scene load_steps=2 format=3 uid="uid://bwmxa_demo_main"]
+[gd_scene load_steps=18 format=3 uid="uid://bwmxa_demo_main"]
 
 [ext_resource type="Script" path="res://example/scripts/main.gd" id="1_main"]
+
+[sub_resource type="StyleBoxFlat" id="bg_panel"]
+bg_color = Color(0.067, 0.067, 0.09, 1)
+
+[sub_resource type="StyleBoxFlat" id="card_style"]
+bg_color = Color(0.1, 0.1, 0.14, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="status_card"]
+bg_color = Color(0.08, 0.08, 0.12, 1)
+border_width_left = 3
+border_color = Color(0.6, 0.33, 1.0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 16.0
+content_margin_top = 14.0
+content_margin_right = 16.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="btn_connect_normal"]
+bg_color = Color(0.0, 0.82, 0.55, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="btn_connect_hover"]
+bg_color = Color(0.0, 0.92, 0.62, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="btn_disconnect_normal"]
+bg_color = Color(0.85, 0.2, 0.25, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="btn_disconnect_hover"]
+bg_color = Color(0.95, 0.25, 0.3, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="btn_action_normal"]
+bg_color = Color(0.14, 0.14, 0.2, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.33, 1.0, 0.4)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="btn_action_hover"]
+bg_color = Color(0.18, 0.15, 0.28, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.33, 1.0, 0.7)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="btn_siws_normal"]
+bg_color = Color(0.44, 0.18, 0.9, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="btn_siws_hover"]
+bg_color = Color(0.52, 0.24, 1.0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="btn_cache_normal"]
+bg_color = Color(0.12, 0.12, 0.16, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.4, 0.5, 0.3)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="log_bg"]
+bg_color = Color(0.04, 0.04, 0.06, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.2, 0.28, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="btn_reconnect_normal"]
+bg_color = Color(0.14, 0.14, 0.2, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.0, 0.82, 0.55, 0.4)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="btn_reconnect_hover"]
+bg_color = Color(0.1, 0.18, 0.16, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.0, 0.82, 0.55, 0.7)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -11,168 +200,239 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="BgPanel" type="PanelContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
+theme_override_styles/panel = SubResource("bg_panel")
 
-[node name="VBox" type="VBoxContainer" parent="MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="BgPanel"]
 layout_mode = 2
-theme_override_constants/separation = 8
+horizontal_scroll_mode = 0
 
-[node name="TitleLabel" type="Label" parent="MarginContainer/VBox"]
+[node name="MarginContainer" type="MarginContainer" parent="BgPanel/ScrollContainer"]
 layout_mode = 2
-text = "Solana MWA SDK Demo"
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="BgPanel/ScrollContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
+layout_mode = 2
+text = "Solana MWA SDK"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 28
 
-[node name="HSep1" type="HSeparator" parent="MarginContainer/VBox"]
+[node name="SubtitleLabel" type="Label" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
+layout_mode = 2
+text = "Mobile Wallet Adapter Demo"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.6, 0.33, 1.0, 0.8)
+theme_override_font_sizes/font_size = 14
+
+[node name="StatusCard" type="PanelContainer" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("status_card")
+
+[node name="StatusVBox" type="VBoxContainer" parent="BgPanel/ScrollContainer/MarginContainer/VBox/StatusCard"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="StatusRow" type="HBoxContainer" parent="BgPanel/ScrollContainer/MarginContainer/VBox/StatusCard/StatusVBox"]
 layout_mode = 2
 
-[node name="StatusRow" type="HBoxContainer" parent="MarginContainer/VBox"]
+[node name="StatusTitle" type="Label" parent="BgPanel/ScrollContainer/MarginContainer/VBox/StatusCard/StatusVBox/StatusRow"]
 layout_mode = 2
+text = "STATUS"
+theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
+theme_override_font_sizes/font_size = 11
 
-[node name="StatusTitle" type="Label" parent="MarginContainer/VBox/StatusRow"]
-layout_mode = 2
-text = "Status: "
-
-[node name="StatusLabel" type="Label" parent="MarginContainer/VBox/StatusRow"]
+[node name="StatusLabel" type="Label" parent="BgPanel/ScrollContainer/MarginContainer/VBox/StatusCard/StatusVBox/StatusRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Disconnected"
-modulate = Color(1, 0.3, 0.3, 1)
+theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 14
 
-[node name="PubkeyLabel" type="Label" parent="MarginContainer/VBox"]
+[node name="PubkeyLabel" type="Label" parent="BgPanel/ScrollContainer/MarginContainer/VBox/StatusCard/StatusVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Not connected"
+text = "No wallet connected"
+theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
 theme_override_font_sizes/font_size = 12
 autowrap_mode = 2
+text_overrun_behavior = 3
 
-[node name="HSep2" type="HSeparator" parent="MarginContainer/VBox"]
+[node name="ClusterCard" type="PanelContainer" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("card_style")
+
+[node name="ClusterRow" type="HBoxContainer" parent="BgPanel/ScrollContainer/MarginContainer/VBox/ClusterCard"]
 layout_mode = 2
 
-[node name="ClusterRow" type="HBoxContainer" parent="MarginContainer/VBox"]
+[node name="ClusterLabel" type="Label" parent="BgPanel/ScrollContainer/MarginContainer/VBox/ClusterCard/ClusterRow"]
 layout_mode = 2
+text = "Network"
+theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 14
 
-[node name="ClusterLabel" type="Label" parent="MarginContainer/VBox/ClusterRow"]
+[node name="ClusterOption" type="OptionButton" parent="BgPanel/ScrollContainer/MarginContainer/VBox/ClusterCard/ClusterRow"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Cluster: "
+size_flags_horizontal = 10
+theme_override_font_sizes/font_size = 14
 
-[node name="ClusterOption" type="OptionButton" parent="MarginContainer/VBox/ClusterRow"]
+[node name="ConnRow" type="HBoxContainer" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ConnectBtn" type="Button" parent="BgPanel/ScrollContainer/MarginContainer/VBox/ConnRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="ConnRow" type="HBoxContainer" parent="MarginContainer/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="ConnectBtn" type="Button" parent="MarginContainer/VBox/ConnRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 15
 text = "Connect"
+theme_override_styles/normal = SubResource("btn_connect_normal")
+theme_override_styles/hover = SubResource("btn_connect_hover")
 
-[node name="DisconnectBtn" type="Button" parent="MarginContainer/VBox/ConnRow"]
+[node name="DisconnectBtn" type="Button" parent="BgPanel/ScrollContainer/MarginContainer/VBox/ConnRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 15
 text = "Disconnect"
 disabled = true
+theme_override_styles/normal = SubResource("btn_disconnect_normal")
+theme_override_styles/hover = SubResource("btn_disconnect_hover")
 
-[node name="ReconnectBtn" type="Button" parent="MarginContainer/VBox/ConnRow"]
+[node name="ReconnectBtn" type="Button" parent="BgPanel/ScrollContainer/MarginContainer/VBox/ConnRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.0, 0.82, 0.55, 1)
+theme_override_colors/font_hover_color = Color(0.0, 0.92, 0.62, 1)
+theme_override_font_sizes/font_size = 15
 text = "Reconnect"
+theme_override_styles/normal = SubResource("btn_reconnect_normal")
+theme_override_styles/hover = SubResource("btn_reconnect_hover")
 
-[node name="HSep3" type="HSeparator" parent="MarginContainer/VBox"]
+[node name="MethodsLabel" type="Label" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
 layout_mode = 2
-
-[node name="MethodsLabel" type="Label" parent="MarginContainer/VBox"]
-layout_mode = 2
-text = "API Methods"
+text = "WALLET METHODS"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
+theme_override_font_sizes/font_size = 11
 
-[node name="CapabilitiesBtn" type="Button" parent="MarginContainer/VBox"]
+[node name="CapabilitiesBtn" type="Button" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 14
 text = "Get Capabilities"
 disabled = true
+theme_override_styles/normal = SubResource("btn_action_normal")
+theme_override_styles/hover = SubResource("btn_action_hover")
 
-[node name="SignRow" type="HBoxContainer" parent="MarginContainer/VBox"]
+[node name="SignRow" type="HBoxContainer" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
-[node name="SignTxBtn" type="Button" parent="MarginContainer/VBox/SignRow"]
+[node name="SignTxBtn" type="Button" parent="BgPanel/ScrollContainer/MarginContainer/VBox/SignRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.8, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 14
 text = "Sign Tx"
 disabled = true
+theme_override_styles/normal = SubResource("btn_action_normal")
+theme_override_styles/hover = SubResource("btn_action_hover")
 
-[node name="SignSendBtn" type="Button" parent="MarginContainer/VBox/SignRow"]
+[node name="SignSendBtn" type="Button" parent="BgPanel/ScrollContainer/MarginContainer/VBox/SignRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.8, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 14
 text = "Sign & Send"
 disabled = true
+theme_override_styles/normal = SubResource("btn_action_normal")
+theme_override_styles/hover = SubResource("btn_action_hover")
 
-[node name="MsgRow" type="HBoxContainer" parent="MarginContainer/VBox"]
+[node name="MsgRow" type="HBoxContainer" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
-[node name="SignMsgBtn" type="Button" parent="MarginContainer/VBox/MsgRow"]
+[node name="SignMsgBtn" type="Button" parent="BgPanel/ScrollContainer/MarginContainer/VBox/MsgRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.8, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 14
 text = "Sign Message"
 disabled = true
+theme_override_styles/normal = SubResource("btn_action_normal")
+theme_override_styles/hover = SubResource("btn_action_hover")
 
-[node name="CloneAuthBtn" type="Button" parent="MarginContainer/VBox/MsgRow"]
+[node name="CloneAuthBtn" type="Button" parent="BgPanel/ScrollContainer/MarginContainer/VBox/MsgRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.8, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 14
 text = "Clone Auth"
 disabled = true
+theme_override_styles/normal = SubResource("btn_action_normal")
+theme_override_styles/hover = SubResource("btn_action_hover")
 
-[node name="SIWSRow" type="HBoxContainer" parent="MarginContainer/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="SIWSBtn" type="Button" parent="MarginContainer/VBox/SIWSRow"]
+[node name="SIWSBtn" type="Button" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 15
 text = "Sign In With Solana"
+theme_override_styles/normal = SubResource("btn_siws_normal")
+theme_override_styles/hover = SubResource("btn_siws_hover")
 
-[node name="ClearCacheBtn" type="Button" parent="MarginContainer/VBox"]
+[node name="ClearCacheBtn" type="Button" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
+theme_override_font_sizes/font_size = 13
 text = "Clear Auth Cache"
+theme_override_styles/normal = SubResource("btn_cache_normal")
 
-[node name="HSep4" type="HSeparator" parent="MarginContainer/VBox"]
+[node name="LogLabel" type="Label" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
 layout_mode = 2
-
-[node name="LogLabel" type="Label" parent="MarginContainer/VBox"]
-layout_mode = 2
-text = "Output Log"
+text = "OUTPUT LOG"
 horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.5, 0.6, 1)
+theme_override_font_sizes/font_size = 11
 
-[node name="OutputLog" type="RichTextLabel" parent="MarginContainer/VBox"]
+[node name="LogPanel" type="PanelContainer" parent="BgPanel/ScrollContainer/MarginContainer/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 260)
+theme_override_styles/panel = SubResource("log_bg")
+
+[node name="OutputLog" type="RichTextLabel" parent="BgPanel/ScrollContainer/MarginContainer/VBox/LogPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.7, 0.75, 0.8, 1)
+theme_override_font_sizes/normal_font_size = 13
 bbcode_enabled = true
 text = ""
 scroll_following = true
-theme_override_font_sizes/normal_font_size = 12
