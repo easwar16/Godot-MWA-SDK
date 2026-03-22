@@ -239,17 +239,17 @@ class SignInPayload:
 		if version != "":
 			d["version"] = version
 		if chain_id != "":
-			d["chain_id"] = chain_id
+			d["chainId"] = chain_id
 		if nonce != "":
 			d["nonce"] = nonce
 		if issued_at != "":
-			d["issued_at"] = issued_at
+			d["issuedAt"] = issued_at
 		if expiration_time != "":
-			d["expiration_time"] = expiration_time
+			d["expirationTime"] = expiration_time
 		if not_before != "":
-			d["not_before"] = not_before
+			d["notBefore"] = not_before
 		if request_id != "":
-			d["request_id"] = request_id
+			d["requestId"] = request_id
 		if resources.size() > 0:
 			d["resources"] = resources
 		return d

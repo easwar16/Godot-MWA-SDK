@@ -566,7 +566,9 @@ func authorize_and_sign_messages(
 # ASYNC WRAPPERS — for GDScript 4 await usage
 # ===================================================================
 
-func _race_signals(success_signal: Signal, fail_signal: Signal) -> Array:
+func _race_signals(
+		success_signal: Signal, fail_signal: Signal,
+		fail_signal2: Signal = Signal()) -> Array:
 	var result := []
 	var done := false
 	var on_success := func(arg1 = null, arg2 = null):
@@ -579,6 +581,8 @@ func _race_signals(success_signal: Signal, fail_signal: Signal) -> Array:
 			result = [false, arg1, arg2]
 	success_signal.connect(on_success, CONNECT_ONE_SHOT)
 	fail_signal.connect(on_fail, CONNECT_ONE_SHOT)
+	if fail_signal2.get_object() != null:
+		fail_signal2.connect(on_fail, CONNECT_ONE_SHOT)
 	while not done:
 		await get_tree().process_frame
 	return result
@@ -635,7 +639,9 @@ func get_capabilities_async() -> MWATypes.Result:
 ## Authorize and sign transactions in a single session, await the result.
 func authorize_and_sign_transactions_async(payloads: Array, sign_in_payload = null) -> MWATypes.Result:
 	authorize_and_sign_transactions(payloads, sign_in_payload)
-	var r = await _race_signals(transactions_signed, authorization_failed)
+	var r = await _race_signals(
+		transactions_signed, authorization_failed,
+		transactions_sign_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
 	return MWATypes.Result.err(r[1], r[2])
@@ -643,10 +649,12 @@ func authorize_and_sign_transactions_async(payloads: Array, sign_in_payload = nu
 
 ## Authorize and sign+send transactions in a single session, await the result.
 func authorize_and_sign_and_send_transactions_async(
-		payloads: Array, options = null,
-		sign_in_payload = null) -> MWATypes.Result:
-	authorize_and_sign_and_send_transactions(payloads, options, sign_in_payload)
-	var r = await _race_signals(transactions_sent, authorization_failed)
+		payloads: Array, sign_in_payload = null,
+		options = null) -> MWATypes.Result:
+	authorize_and_sign_and_send_transactions(payloads, sign_in_payload, options)
+	var r = await _race_signals(
+		transactions_sent, authorization_failed,
+		transactions_send_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
 	return MWATypes.Result.err(r[1], r[2])
@@ -657,7 +665,9 @@ func authorize_and_sign_messages_async(
 		messages: Array, addresses: PackedStringArray = [],
 		sign_in_payload = null) -> MWATypes.Result:
 	authorize_and_sign_messages(messages, addresses, sign_in_payload)
-	var r = await _race_signals(messages_signed, authorization_failed)
+	var r = await _race_signals(
+		messages_signed, authorization_failed,
+		messages_sign_failed)
 	if r[0]:
 		return MWATypes.Result.ok(r[1])
 	return MWATypes.Result.err(r[1], r[2])
