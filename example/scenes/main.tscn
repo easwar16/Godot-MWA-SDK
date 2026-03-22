@@ -472,6 +472,28 @@ theme_override_font_sizes/font_size = 11
 text = "Check Features"
 theme_override_styles/normal = SubResource("bb1")
 
+[node name="Row3" type="HBoxContainer" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/Step3Content"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="AuthSignBtn" type="Button" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/Step3Content/Row3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.6, 0.27, 1.0, 1)
+theme_override_font_sizes/font_size = 10
+text = "Auth + Sign Tx"
+theme_override_styles/normal = SubResource("bb1")
+
+[node name="AuthSendBtn" type="Button" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V/Step3Content/Row3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.6, 0.27, 1.0, 1)
+theme_override_font_sizes/font_size = 10
+text = "Auth + Send"
+theme_override_styles/normal = SubResource("bb1")
+
 [node name="Step3Hint" type="Label" parent="Bg/MainVBox/Scroll/Margin/Steps/Step3Card/V"]
 unique_name_in_owner = true
 layout_mode = 2

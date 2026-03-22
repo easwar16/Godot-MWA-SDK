@@ -47,6 +47,8 @@ var _toast_tween: Tween
 @onready var sign_send_btn: Button = %SignSendBtn
 @onready var sign_msg_btn: Button = %SignMsgBtn
 @onready var features_btn: Button = %FeaturesBtn
+@onready var auth_sign_btn: Button = %AuthSignBtn
+@onready var auth_send_btn: Button = %AuthSendBtn
 
 # --- Step 4: Session ---
 @onready var disconnect_btn: Button = %DisconnectBtn
@@ -109,6 +111,8 @@ func _wire_buttons() -> void:
 	sign_send_btn.pressed.connect(_on_sign_and_send)
 	sign_msg_btn.pressed.connect(_on_sign_message)
 	features_btn.pressed.connect(_on_get_capabilities)
+	auth_sign_btn.pressed.connect(_on_auth_and_sign)
+	auth_send_btn.pressed.connect(_on_auth_and_send)
 	disconnect_btn.pressed.connect(_on_disconnect)
 	reconnect_btn.pressed.connect(_on_reconnect)
 	deauth_btn.pressed.connect(_on_deauthorize)
@@ -472,6 +476,40 @@ func _on_sign_message() -> void:
 	_set_loading(sign_msg_btn, "Signing...")
 	_log("Signing message...")
 	adapter.sign_messages([msg] as Array)
+
+
+func _on_auth_and_sign() -> void:
+	_set_loading(auth_sign_btn, "Auth+Sign...")
+	_log("Fetching blockhash for auth+sign...")
+	var blockhash := await _fetch_recent_blockhash()
+	if blockhash.size() != 32:
+		_show_toast("Failed to fetch blockhash", true)
+		_restore_button(auth_sign_btn)
+		return
+	var tx := _build_memo_tx(blockhash)
+	if tx.is_empty():
+		_show_toast("Build tx failed", true)
+		_restore_button(auth_sign_btn)
+		return
+	_log("Auth + sign in single session...")
+	adapter.authorize_and_sign_transactions([tx] as Array)
+
+
+func _on_auth_and_send() -> void:
+	_set_loading(auth_send_btn, "Auth+Send...")
+	_log("Fetching blockhash for auth+send...")
+	var blockhash := await _fetch_recent_blockhash()
+	if blockhash.size() != 32:
+		_show_toast("Failed to fetch blockhash", true)
+		_restore_button(auth_send_btn)
+		return
+	var tx := _build_memo_tx(blockhash)
+	if tx.is_empty():
+		_show_toast("Build tx failed", true)
+		_restore_button(auth_send_btn)
+		return
+	_log("Auth + sign & send in single session...")
+	adapter.authorize_and_sign_and_send_transactions([tx] as Array)
 
 
 func _on_get_capabilities() -> void:
