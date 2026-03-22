@@ -157,9 +157,10 @@ func _update_steps() -> void:
 	var connected := adapter.is_wallet_connected()
 	var busy := adapter.is_busy()
 
-	# Step 1: Disable connect only when actively connected or busy.
+	# Step 1: Disable connect only when actively connected.
+	# Allow connect even during cooldown so user isn't stuck.
 	_update_status_indicator()
-	connect_btn.disabled = busy or connected
+	connect_btn.disabled = connected or adapter._busy
 
 	# Step 2: Unlock after connected.
 	_set_step_locked(step2_content, step2_hint, !connected)
@@ -167,9 +168,8 @@ func _update_steps() -> void:
 	# Step 3: Unlock after authorized.
 	_set_step_locked(step3_content, step3_hint, !connected)
 
-	# Step 4: Unlock after connected (need something to manage).
-	var has_session := connected or adapter.auth_cache.has_authorization()
-	_set_step_locked(step4_content, step4_hint, !has_session)
+	# Step 4: Always available — reconnect/reset are useful when disconnected.
+	_set_step_locked(step4_content, step4_hint, false)
 
 	# Reconnect only makes sense when disconnected but cache exists.
 	reconnect_btn.visible = !connected and adapter.auth_cache.has_authorization()
