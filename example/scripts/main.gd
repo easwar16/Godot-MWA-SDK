@@ -376,7 +376,7 @@ func _on_reset_session() -> void:
 
 func _on_authorized(result) -> void:
 	var acc = result.accounts[0] if result.accounts.size() > 0 else null
-	var addr := acc.address if acc != null else "unknown"
+	var addr: String = acc.address if acc != null else "unknown"
 	_show_toast("Wallet connected: %s" % _shorten(addr))
 	_log("[color=#00d4aa]Connected![/color] %s" % _shorten(addr))
 	_log("  Auth token: %s..." % result.auth_token.substr(0, 16))
