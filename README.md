@@ -334,7 +334,17 @@ android/                        # Kotlin Android plugin (builds to .aar)
 
 example/                        # Demo app
   scenes/main.tscn             # UI layout
-  scripts/main.gd              # Signal handlers, button wiring
+  scripts/main.gd              # Signal handlers, button wiring, SIWS demo
+
+tests/                          # Unit test suite
+  scripts/
+    run_tests.gd               # Test runner
+    test_mwa_types.gd          # Data class and enum tests
+    test_mwa_cache.gd          # Cache layer tests
+    test_adapter_state.gd      # State management and guard tests
+
+.github/workflows/
+  build.yml                    # CI: Gradle build, tests, lint
 
 docs/
   INSTALLATION.md              # Build and setup guide
@@ -377,6 +387,24 @@ docs/
 - Android device or emulator with an MWA-compatible wallet (Phantom, Solflare)
 - Android SDK 24+ (Android 7.0)
 - Java JDK 17 (for building the Kotlin plugin)
+
+## Testing
+
+Run the GDScript unit test suite:
+
+```bash
+godot --headless --script tests/scripts/run_tests.gd --quit
+```
+
+The test suite covers:
+- **MWATypes** — enum values, data class serialization/deserialization roundtrips, utility functions
+- **MWACache** — abstract cache contract, file cache read/write/clear, custom cache extensibility
+- **Adapter State** — initial state, error guards (no-plugin, no-auth, busy), state machine transitions, cache swap
+
+CI runs automatically on push/PR via GitHub Actions (`.github/workflows/build.yml`):
+- Android plugin Gradle build verification
+- GDScript unit tests via headless Godot
+- GDScript lint via gdtoolkit
 
 ## Future Improvements
 

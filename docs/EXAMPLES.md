@@ -136,6 +136,73 @@ func _on_batch_signed(signed_payloads: Array):
     # Submit each to RPC manually, or use sign_and_send_transactions.
 ```
 
+## Sign In With Solana (SIWS)
+
+```gdscript
+## Authenticate a user with Sign In With Solana.
+## The wallet signs a structured message that can be verified server-side,
+## proving the user owns the wallet without a blockchain transaction.
+
+func sign_in_with_solana():
+    var siws := MWATypes.SignInPayload.new()
+    siws.domain = "mygame.com"
+    siws.statement = "Sign in to My Game to access your inventory."
+    siws.uri = "https://mygame.com"
+    siws.version = "1"
+    siws.chain_id = "devnet"  # or "mainnet"
+    siws.issued_at = Time.get_datetime_string_from_system(true)
+
+    MWA.adapter.authorized.connect(_on_siws_authorized, CONNECT_ONE_SHOT)
+    MWA.adapter.authorization_failed.connect(_on_siws_failed, CONNECT_ONE_SHOT)
+    MWA.adapter.authorize(siws)
+
+func _on_siws_authorized(result: MWATypes.AuthorizationResult):
+    print("Signed in! Account: ", result.accounts[0].address)
+
+    # The sign_in_result contains the signed message + signature.
+    # Send this to your backend for verification.
+    if result.sign_in_result.size() > 0:
+        print("SIWS signed message: ", result.sign_in_result.get("signed_message", ""))
+        print("SIWS signature: ", result.sign_in_result.get("signature", ""))
+        # verify_on_backend(result.sign_in_result)
+
+func _on_siws_failed(code: int, msg: String):
+    match code:
+        MWATypes.ErrorCode.USER_DECLINED:
+            print("User declined sign-in")
+        _:
+            print("Sign-in failed: ", msg)
+```
+
+## Authorize and Sign in One Session (Batching)
+
+```gdscript
+## Combines authorization and signing into a single wallet interaction.
+## The player sees the wallet open once instead of twice.
+
+func onboard_and_sign():
+    var tx_bytes: PackedByteArray = build_onboarding_transaction()
+
+    MWA.adapter.authorized.connect(_on_onboard_auth, CONNECT_ONE_SHOT)
+    MWA.adapter.transactions_signed.connect(_on_onboard_signed, CONNECT_ONE_SHOT)
+    MWA.adapter.authorize_and_sign_transactions([tx_bytes])
+
+func _on_onboard_auth(result):
+    print("Authorized during batch: ", result.accounts[0].address)
+
+func _on_onboard_signed(signed_payloads: Array):
+    print("Transaction signed in same session!")
+
+## Async version (less boilerplate):
+func onboard_and_sign_async():
+    var tx_bytes: PackedByteArray = build_onboarding_transaction()
+    var result = await MWA.adapter.authorize_and_sign_transactions_async([tx_bytes])
+    if result.success:
+        print("Batch operation succeeded!")
+    else:
+        print("Failed: ", result.error_message)
+```
+
 ## Full Lifecycle Example
 
 ```gdscript
