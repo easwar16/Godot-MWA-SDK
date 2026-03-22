@@ -557,6 +557,11 @@ func authorize_and_sign_messages(
 	for msg in messages_to_sign:
 		encoded.append(Marshalls.raw_to_base64(msg))
 
+	# Default to cached account address if available.
+	if addresses.is_empty() and current_auth != null:
+		if current_auth.accounts.size() > 0:
+			addresses.append(current_auth.accounts[0].address)
+
 	_android_plugin.call("authorizeAndSignMessages",
 		identity.uri, identity.icon, identity.name,
 		_get_chain(), cached_token, sign_in_json, encoded, addresses)

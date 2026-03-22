@@ -800,8 +800,14 @@ class MWAClient {
                 }
 
                 val result = withTimeoutOrNull(timeoutMs) {
-                    walletAdapter.transact(sender) { _ ->
-                        val signed = signMessagesDetached(messages, addresses)
+                    walletAdapter.transact(sender) { authResult ->
+                        // Default to first auth account if no addresses provided.
+                        val signerAddresses = if (addresses.isEmpty()) {
+                            arrayOf(authResult.accounts.first().publicKey)
+                        } else {
+                            addresses
+                        }
+                        val signed = signMessagesDetached(messages, signerAddresses)
                         signed
                     }
                 }
@@ -815,7 +821,6 @@ class MWAClient {
                     is TransactionResult.Success -> {
                         val authResult = result.authResult
                         val json = buildAuthJson(authResult)
-                        // Add signatures
                         val sigArr = JSONArray()
                         result.payload.messages.forEach { msg ->
                             msg.signatures.forEach { sig ->
