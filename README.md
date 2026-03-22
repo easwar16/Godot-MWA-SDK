@@ -303,11 +303,11 @@ Features:
 
 1. Clone the repo and run the setup script:
    ```bash
-   git clone https://github.com/easwar16/Godot-MWA-SDK-.git
-   cd Godot-MWA-SDK-
+   git clone https://github.com/easwar16/Godot-MWA-SDK.git
+   cd Godot-MWA-SDK
    ./setup.sh
    ```
-2. Open the project in Godot 4.3+
+2. Open the project in Godot 4.6+
 3. Go to **Project > Export**, add an Android preset with these settings:
    - Gradle Build: **enabled**
    - Min SDK: **24**
@@ -323,7 +323,7 @@ The main scene is already set to `example/scenes/main.tscn`.
 1. **Connect** — Tap Connect, approve in wallet, verify status turns green
 2. **Sign In With Solana** — Tap SIWS, approve in wallet, verify SIWS result data in log
 3. **Reconnect** — Close and reopen the app, tap Reconnect, verify it connects without wallet prompt
-4. **Sign Transaction** — After connecting, tap Sign Tx (sends dummy bytes, wallet will reject — this is expected)
+4. **Sign Transaction** — After connecting, tap Sign Tx (sends a Memo transaction with a real blockhash from the selected cluster's RPC)
 5. **Sign Message** — Tap Sign Message, approve in wallet, verify signature appears in log
 6. **Disconnect** — Tap Disconnect, verify status turns red and cache is cleared
 7. **Clear Cache** — Tap Clear Auth Cache, verify reconnect requires fresh approval
@@ -405,7 +405,7 @@ docs/
 
 ## Requirements
 
-- Godot 4.3+
+- Godot 4.6+
 - Android device or emulator with an MWA-compatible wallet (Phantom, Solflare)
 - Android SDK 24+ (Android 7.0)
 - Java JDK 17 (for building the Kotlin plugin)
