@@ -132,8 +132,10 @@ func _end_operation() -> void:
 	# before allowing the next operation (prevents WebSocket conflicts).
 	_cooldown_until = Time.get_ticks_msec() / 1000.0 + 1.5
 	_log_debug("operation completed")
-	# Re-emit state so UI can refresh button states after busy clears.
+	# Emit state now, then again after cooldown so UI re-enables buttons.
 	state_changed.emit(state)
+	get_tree().create_timer(1.6).timeout.connect(
+		func(): state_changed.emit(state))
 
 
 func _ready() -> void:
