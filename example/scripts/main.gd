@@ -6,6 +6,7 @@ extends Control
 @onready var step2_card: PanelContainer = %Step2Card
 @onready var step3_card: PanelContainer = %Step3Card
 @onready var step4_card: PanelContainer = %Step4Card
+@onready var log_card: PanelContainer = %LogCard
 
 # --- Step Content (locked/unlocked toggling) ---
 @onready var step2_content: VBoxContainer = %Step2Content
@@ -40,19 +41,22 @@ extends Control
 @onready var reset_btn: Button = %ResetBtn
 
 # --- Log ---
-@onready var log_toggle_btn: Button = %LogToggleBtn
-@onready var log_panel: PanelContainer = %LogPanel
 @onready var output_log: RichTextLabel = %OutputLog
+@onready var clear_btn: Button = %ClearBtn
 
 # --- Toast ---
+@onready var toast_margin: MarginContainer = %ToastMargin
 @onready var toast_panel: PanelContainer = %ToastPanel
 @onready var toast_label: Label = %ToastLabel
 
 # --- State ---
 var adapter: MobileWalletAdapter
-var _log_visible := false
-var _button_labels := {}  # Stores original text for loading states
+var _button_labels := {}
 var _toast_tween: Tween
+var _connect_btn_normal_style: StyleBox
+var _prev_step2_locked := true
+var _prev_step3_locked := true
+var _prev_step4_locked := true
 
 # --- Colors ---
 const C_GREEN := Color(0.0, 0.83, 0.67)
@@ -75,12 +79,14 @@ func _ready() -> void:
 	adapter.debug_logging = true
 	adapter.debug_log.connect(func(msg): _log("[color=#555570][DEBUG] %s[/color]" % msg))
 
+	_connect_btn_normal_style = connect_btn.get_theme_stylebox("normal")
+
 	_connect_adapter_signals()
 	_wire_buttons()
 	_setup_cluster_selector()
 	_setup_toast()
-	_setup_log()
 	_update_steps()
+	_play_entrance_animation()
 
 	if adapter.auth_cache.has_authorization():
 		_log("Cached session found. Tap [b]Reconnect[/b] to restore.")
@@ -113,7 +119,14 @@ func _wire_buttons() -> void:
 	reconnect_btn.pressed.connect(_on_reconnect)
 	deauth_btn.pressed.connect(_on_deauthorize)
 	reset_btn.pressed.connect(_on_reset_session)
-	log_toggle_btn.pressed.connect(_on_toggle_log)
+	clear_btn.pressed.connect(_on_clear_log)
+
+	# Wire press animations to all interactive buttons.
+	for btn in [connect_btn, siws_btn, sign_tx_btn, sign_send_btn,
+			sign_msg_btn, features_btn, disconnect_btn, reconnect_btn,
+			deauth_btn, reset_btn, clear_btn]:
+		btn.button_down.connect(_animate_button_press.bind(btn))
+		btn.button_up.connect(_animate_button_release.bind(btn))
 
 
 func _setup_cluster_selector() -> void:
@@ -126,12 +139,51 @@ func _setup_cluster_selector() -> void:
 func _setup_toast() -> void:
 	toast_panel.visible = false
 	toast_panel.modulate.a = 0.0
+	var safe := DisplayServer.get_display_safe_area()
+	var screen := DisplayServer.screen_get_size()
+	if screen.y > 0:
+		var safe_top := int(safe.position.y * get_viewport().get_visible_rect().size.y / screen.y)
+		if safe_top > 0:
+			toast_margin.add_theme_constant_override("margin_top", safe_top + 6)
 
 
-func _setup_log() -> void:
-	log_panel.visible = false
-	_log_visible = false
-	log_toggle_btn.text = "Show Output Log"
+# ===================================================================
+# ENTRANCE ANIMATION
+# ===================================================================
+
+func _play_entrance_animation() -> void:
+	var cards: Array[Control] = [step1_card, step2_card, step3_card, step4_card, log_card]
+	for card in cards:
+		card.modulate.a = 0.0
+		card.position.y += 12.0
+
+	var tw := create_tween()
+	tw.set_ease(Tween.EASE_OUT)
+	tw.set_trans(Tween.TRANS_CUBIC)
+
+	for i in range(cards.size()):
+		var card := cards[i]
+		var target_y := card.position.y - 12.0
+		tw.tween_property(card, "modulate:a", 1.0, 0.3).set_delay(i * 0.06)
+		tw.parallel().tween_property(card, "position:y", target_y, 0.3).set_delay(i * 0.06)
+
+
+# ===================================================================
+# BUTTON PRESS ANIMATIONS
+# ===================================================================
+
+func _animate_button_press(btn: Button) -> void:
+	var tw := create_tween()
+	tw.set_ease(Tween.EASE_OUT)
+	tw.set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(btn, "scale", Vector2(0.97, 0.97), 0.08)
+
+
+func _animate_button_release(btn: Button) -> void:
+	var tw := create_tween()
+	tw.set_ease(Tween.EASE_OUT)
+	tw.set_trans(Tween.TRANS_ELASTIC)
+	tw.tween_property(btn, "scale", Vector2.ONE, 0.35)
 
 
 # ===================================================================
@@ -145,16 +197,51 @@ func _update_steps() -> void:
 	# Step 1: Always enabled.
 	_update_status_indicator()
 	connect_btn.disabled = busy
+	if authorized:
+		connect_btn.text = "Disconnect"
+		connect_btn.add_theme_color_override("font_color", C_RED)
+		connect_btn.add_theme_color_override("font_hover_color", C_RED)
+		var outline := StyleBoxFlat.new()
+		outline.bg_color = Color.TRANSPARENT
+		outline.border_color = C_RED
+		outline.set_border_width_all(1)
+		outline.set_corner_radius_all(10)
+		outline.content_margin_left = 12.0
+		outline.content_margin_top = 12.0
+		outline.content_margin_right = 12.0
+		outline.content_margin_bottom = 12.0
+		connect_btn.add_theme_stylebox_override("normal", outline)
+		connect_btn.add_theme_stylebox_override("hover", outline)
+	else:
+		connect_btn.text = "Connect Wallet"
+		connect_btn.add_theme_color_override("font_color", Color(0.02, 0.02, 0.03))
+		connect_btn.add_theme_color_override("font_hover_color", Color(0.02, 0.02, 0.03))
+		connect_btn.add_theme_color_override("font_pressed_color", Color(0.02, 0.02, 0.03))
+		connect_btn.add_theme_stylebox_override("normal", _connect_btn_normal_style)
+		connect_btn.add_theme_stylebox_override("hover", connect_btn.get_theme_stylebox("hover"))
+		connect_btn.add_theme_stylebox_override("pressed", connect_btn.get_theme_stylebox("pressed"))
 
 	# Step 2: Unlock after connected.
-	_set_step_locked(step2_content, step2_hint, !authorized)
+	var s2_locked := !authorized
+	_set_step_locked(step2_content, step2_hint, s2_locked)
+	if _prev_step2_locked and not s2_locked:
+		_animate_step_unlock(step2_card)
+	_prev_step2_locked = s2_locked
 
 	# Step 3: Unlock after authorized.
-	_set_step_locked(step3_content, step3_hint, !authorized)
+	var s3_locked := !authorized
+	_set_step_locked(step3_content, step3_hint, s3_locked)
+	if _prev_step3_locked and not s3_locked:
+		_animate_step_unlock(step3_card)
+	_prev_step3_locked = s3_locked
 
 	# Step 4: Unlock after connected (need something to manage).
 	var has_session := authorized or adapter.auth_cache.has_authorization()
-	_set_step_locked(step4_content, step4_hint, !has_session)
+	var s4_locked := !has_session
+	_set_step_locked(step4_content, step4_hint, s4_locked)
+	if _prev_step4_locked and not s4_locked:
+		_animate_step_unlock(step4_card)
+	_prev_step4_locked = s4_locked
 
 	# Wallet address.
 	var acc = adapter.get_account()
@@ -181,7 +268,18 @@ func _set_step_locked(content: VBoxContainer, hint: Label, locked: bool) -> void
 					btn.disabled = locked
 
 
+func _animate_step_unlock(card: PanelContainer) -> void:
+	var tw := create_tween()
+	tw.set_ease(Tween.EASE_OUT)
+	tw.set_trans(Tween.TRANS_CUBIC)
+	# Brief scale pulse to draw attention.
+	card.pivot_offset = card.size / 2.0
+	tw.tween_property(card, "scale", Vector2(1.015, 1.015), 0.15)
+	tw.tween_property(card, "scale", Vector2.ONE, 0.25)
+
+
 func _update_status_indicator() -> void:
+	var prev_text := status_label.text
 	match adapter.state:
 		MWATypes.ConnectionState.DISCONNECTED:
 			status_dot.text = "\u25CF"
@@ -208,6 +306,19 @@ func _update_status_indicator() -> void:
 			status_dot.add_theme_color_override("font_color", C_AMBER)
 			status_label.text = "Deauthorizing..."
 			status_label.add_theme_color_override("font_color", C_AMBER)
+
+	# Pulse the status dot when state changes.
+	if status_label.text != prev_text:
+		_pulse_status_dot()
+
+
+func _pulse_status_dot() -> void:
+	var tw := create_tween()
+	tw.set_ease(Tween.EASE_OUT)
+	tw.set_trans(Tween.TRANS_CUBIC)
+	status_dot.pivot_offset = status_dot.size / 2.0
+	tw.tween_property(status_dot, "scale", Vector2(1.6, 1.6), 0.12)
+	tw.tween_property(status_dot, "scale", Vector2.ONE, 0.2)
 
 
 # ===================================================================
@@ -262,7 +373,12 @@ func _show_toast(text: String, is_error: bool = false) -> void:
 		_toast_tween.kill()
 
 	_toast_tween = create_tween()
-	_toast_tween.tween_property(toast_panel, "modulate:a", 1.0, 0.2)
+	_toast_tween.set_ease(Tween.EASE_OUT)
+	_toast_tween.set_trans(Tween.TRANS_CUBIC)
+	# Slide in from top.
+	toast_panel.position.y = -20.0
+	_toast_tween.tween_property(toast_panel, "modulate:a", 1.0, 0.25)
+	_toast_tween.parallel().tween_property(toast_panel, "position:y", 0.0, 0.25)
 	_toast_tween.tween_interval(3.0)
 	_toast_tween.tween_property(toast_panel, "modulate:a", 0.0, 0.4)
 	_toast_tween.tween_callback(func(): toast_panel.visible = false)
@@ -272,10 +388,9 @@ func _show_toast(text: String, is_error: bool = false) -> void:
 # LOG PANEL
 # ===================================================================
 
-func _on_toggle_log() -> void:
-	_log_visible = not _log_visible
-	log_panel.visible = _log_visible
-	log_toggle_btn.text = "Hide Output Log" if _log_visible else "Show Output Log"
+func _on_clear_log() -> void:
+	output_log.clear()
+	_log("[color=#555570]Log cleared.[/color]")
 
 
 func _log(msg: String) -> void:
@@ -289,10 +404,15 @@ func _log(msg: String) -> void:
 # ===================================================================
 
 func _on_connect() -> void:
-	adapter.cluster = cluster_option.get_selected_id() as MWATypes.Cluster
-	_set_loading(connect_btn, "Connecting...")
-	_log("Connecting on %s..." % MWATypes.cluster_to_chain(adapter.cluster))
-	adapter.authorize()
+	if adapter.is_authorized():
+		_set_loading(connect_btn, "Disconnecting...")
+		_log("Disconnecting...")
+		adapter.disconnect_wallet()
+	else:
+		adapter.cluster = cluster_option.get_selected_id() as MWATypes.Cluster
+		_set_loading(connect_btn, "Connecting...")
+		_log("Connecting on %s..." % MWATypes.cluster_to_chain(adapter.cluster))
+		adapter.authorize()
 
 
 func _on_sign_in_with_solana() -> void:

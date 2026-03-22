@@ -133,29 +133,43 @@ func _notification(what: int) -> void:
 
 func _force_timeout() -> void:
 	var action := _poll_action
+	var was_authorized := is_authorized()
 	_end_operation()
 	if _android_plugin != null:
 		_android_plugin.call("clearState")
+	# Restore state: if we were authorized before the operation, go back to CONNECTED;
+	# otherwise fall back to DISCONNECTED.
 	match action:
 		"authorize":
+			state = MWATypes.ConnectionState.DISCONNECTED
 			authorization_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 		"deauthorize":
+			if was_authorized:
+				state = MWATypes.ConnectionState.CONNECTED
 			deauthorization_failed.emit("Operation timed out")
 		"get_capabilities":
+			if was_authorized:
+				state = MWATypes.ConnectionState.CONNECTED
 			capabilities_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 		"sign_transactions":
+			state = MWATypes.ConnectionState.CONNECTED
 			transactions_sign_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 		"sign_and_send_transactions":
+			state = MWATypes.ConnectionState.CONNECTED
 			transactions_send_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 		"sign_messages":
+			state = MWATypes.ConnectionState.CONNECTED
 			messages_sign_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 		"authorize_and_sign_transactions":
+			state = MWATypes.ConnectionState.DISCONNECTED
 			authorization_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 			transactions_sign_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 		"authorize_and_sign_and_send_transactions":
+			state = MWATypes.ConnectionState.DISCONNECTED
 			authorization_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 			transactions_send_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 		"authorize_and_sign_messages":
+			state = MWATypes.ConnectionState.DISCONNECTED
 			authorization_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 			messages_sign_failed.emit(MWATypes.ErrorCode.TIMEOUT, "Operation timed out")
 
