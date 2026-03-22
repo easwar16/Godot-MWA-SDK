@@ -14,6 +14,7 @@ extends Control
 @onready var sign_msg_btn: Button = %SignMsgBtn
 @onready var clone_auth_btn: Button = %CloneAuthBtn
 @onready var clear_cache_btn: Button = %ClearCacheBtn
+@onready var siws_btn: Button = %SIWSBtn
 
 var adapter: MobileWalletAdapter
 
@@ -65,6 +66,7 @@ func _ready() -> void:
 	sign_msg_btn.pressed.connect(_on_sign_message)
 	clone_auth_btn.pressed.connect(_on_clone_auth)
 	clear_cache_btn.pressed.connect(_on_clear_cache)
+	siws_btn.pressed.connect(_on_sign_in_with_solana)
 
 	_update_ui()
 	_log("MWA SDK Demo ready. Select a cluster and connect.")
@@ -136,6 +138,21 @@ func _on_clear_cache() -> void:
 	_log("Authorization cache cleared.")
 
 
+func _on_sign_in_with_solana() -> void:
+	adapter.cluster = cluster_option.get_selected_id() as MWATypes.Cluster
+	var siws := MWATypes.SignInPayload.new()
+	siws.domain = "mwa-sdk-demo.solana.com"
+	siws.statement = "Sign in to MWA SDK Demo"
+	siws.uri = "https://mwa-sdk-demo.solana.com"
+	siws.version = "1"
+	siws.chain_id = MWATypes.cluster_to_chain(adapter.cluster).replace("solana:", "")
+	siws.issued_at = Time.get_datetime_string_from_system(true)
+	_log("Sign In With Solana on %s..." % MWATypes.cluster_to_chain(adapter.cluster))
+	_log("  Domain: %s" % siws.domain)
+	_log("  Statement: %s" % siws.statement)
+	adapter.authorize(siws)
+
+
 # --- Signal handlers ---
 
 func _on_authorized(result) -> void:
@@ -144,6 +161,13 @@ func _on_authorized(result) -> void:
 	_log("[color=green]Authorized![/color] Account: %s" % addr)
 	_log("  Auth token: %s..." % result.auth_token.substr(0, 16))
 	_log("  Accounts: %d" % result.accounts.size())
+	if result.sign_in_result.size() > 0:
+		_log("[color=cyan]  SIWS result:[/color]")
+		for key in result.sign_in_result:
+			var val = result.sign_in_result[key]
+			if val is String and val.length() > 40:
+				val = val.substr(0, 40) + "..."
+			_log("    %s: %s" % [key, str(val)])
 	_log("  Token cached for reconnection.")
 	_update_ui()
 
@@ -269,6 +293,7 @@ func _update_ui() -> void:
 	sign_send_btn.disabled = busy or not connected
 	sign_msg_btn.disabled = busy or not connected
 	clone_auth_btn.disabled = busy or not connected
+	siws_btn.disabled = busy or adapter.state == MWATypes.ConnectionState.CONNECTING
 
 
 func _log(msg: String) -> void:

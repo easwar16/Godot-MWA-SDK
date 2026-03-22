@@ -145,6 +145,16 @@ size_flags_horizontal = 3
 text = "Clone Auth"
 disabled = true
 
+[node name="SIWSRow" type="HBoxContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SIWSBtn" type="Button" parent="MarginContainer/VBox/SIWSRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Sign In With Solana"
+
 [node name="ClearCacheBtn" type="Button" parent="MarginContainer/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
