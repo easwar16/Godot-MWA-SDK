@@ -49,6 +49,7 @@ var _toast_tween: Tween
 @onready var features_btn: Button = %FeaturesBtn
 @onready var auth_sign_btn: Button = %AuthSignBtn
 @onready var auth_send_btn: Button = %AuthSendBtn
+@onready var auth_msg_btn: Button = %AuthMsgBtn
 
 # --- Step 4: Session ---
 @onready var disconnect_btn: Button = %DisconnectBtn
@@ -113,6 +114,7 @@ func _wire_buttons() -> void:
 	features_btn.pressed.connect(_on_get_capabilities)
 	auth_sign_btn.pressed.connect(_on_auth_and_sign)
 	auth_send_btn.pressed.connect(_on_auth_and_send)
+	auth_msg_btn.pressed.connect(_on_auth_and_sign_msg)
 	disconnect_btn.pressed.connect(_on_disconnect)
 	reconnect_btn.pressed.connect(_on_reconnect)
 	deauth_btn.pressed.connect(_on_deauthorize)
@@ -510,6 +512,13 @@ func _on_auth_and_send() -> void:
 		return
 	_log("Auth + sign & send in single session...")
 	adapter.authorize_and_sign_and_send_transactions([tx] as Array)
+
+
+func _on_auth_and_sign_msg() -> void:
+	var msg := "Hello from Godot MWA SDK!".to_utf8_buffer()
+	_set_loading(auth_msg_btn, "Auth+Msg...")
+	_log("Auth + sign message in single session...")
+	adapter.authorize_and_sign_messages([msg] as Array)
 
 
 func _on_get_capabilities() -> void:

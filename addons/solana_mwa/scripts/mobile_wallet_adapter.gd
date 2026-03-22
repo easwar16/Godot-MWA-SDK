@@ -210,8 +210,9 @@ func _force_timeout() -> void:
 
 ## Authorize this dapp with a wallet. If a cached auth_token exists, attempts
 ## reauthorization first. Equivalent to React Native's transact → authorize().
-## Optional features: request specific wallet features (MWA 2.0).
-## Optional addresses: filter authorization to specific addresses.
+## Optional features/addresses: reserved for future MWA 2.0 support. The
+## upstream KTX library does not yet pass these through transact(). Accepted
+## here for forward compatibility — they will take effect when KTX adds support.
 func authorize(
 		sign_in_payload = null,
 		features: PackedStringArray = [],
