@@ -86,6 +86,7 @@ var _android_plugin: Object = null
 var _poll_action: String = ""  # What we're currently polling for
 var _busy: bool = false
 var _poll_start_time: float = 0.0
+var _cooldown_until: float = 0.0  # Prevents rapid successive wallet opens
 
 
 # --- Helper Methods ---
@@ -103,9 +104,15 @@ func _get_chain() -> String:
 		return custom_chain
 	return MWATypes.cluster_to_chain(cluster)
 
-## Returns true if an operation is currently in progress.
+## Returns true if an operation is in progress or in cooldown.
 func is_busy() -> bool:
-	return _busy
+	if _busy:
+		return true
+	if _cooldown_until > 0.0:
+		if Time.get_ticks_msec() / 1000.0 < _cooldown_until:
+			return true
+		_cooldown_until = 0.0
+	return false
 
 func _log_debug(msg: String) -> void:
 	if debug_logging:
@@ -121,6 +128,9 @@ func _start_operation(action: String) -> void:
 func _end_operation() -> void:
 	_busy = false
 	_poll_action = ""
+	# Brief cooldown to let the wallet's MWA session fully close
+	# before allowing the next operation (prevents WebSocket conflicts).
+	_cooldown_until = Time.get_ticks_msec() / 1000.0 + 1.5
 	_log_debug("operation completed")
 	# Re-emit state so UI can refresh button states after busy clears.
 	state_changed.emit(state)
@@ -223,7 +233,7 @@ func authorize(
 			"Android plugin not available")
 		return
 
-	if _busy:
+	if is_busy():
 		authorization_failed.emit(
 			MWATypes.ErrorCode.BUSY,
 			"Another operation is in progress")
@@ -268,7 +278,7 @@ func deauthorize() -> void:
 		deauthorization_failed.emit("Android plugin not available")
 		return
 
-	if _busy:
+	if is_busy():
 		deauthorization_failed.emit("Another operation is in progress")
 		return
 
@@ -308,7 +318,7 @@ func get_capabilities() -> void:
 		capabilities_failed.emit(MWATypes.ErrorCode.NOT_INITIALIZED, "Android plugin not available")
 		return
 
-	if _busy:
+	if is_busy():
 		capabilities_failed.emit(MWATypes.ErrorCode.BUSY, "Another operation is in progress")
 		return
 
@@ -330,7 +340,7 @@ func sign_transactions(payloads: Array) -> void:
 		transactions_sign_failed.emit(MWATypes.ErrorCode.NOT_SIGNED, "Android plugin not available")
 		return
 
-	if _busy:
+	if is_busy():
 		transactions_sign_failed.emit(MWATypes.ErrorCode.BUSY, "Another operation is in progress")
 		return
 
@@ -358,7 +368,7 @@ func sign_and_send_transactions(payloads: Array, options = null) -> void:
 		transactions_send_failed.emit(MWATypes.ErrorCode.NOT_SUBMITTED, "Android plugin not available")
 		return
 
-	if _busy:
+	if is_busy():
 		transactions_send_failed.emit(MWATypes.ErrorCode.BUSY, "Another operation is in progress")
 		return
 
@@ -390,7 +400,7 @@ func sign_messages(messages: Array, addresses: PackedStringArray = []) -> void:
 		messages_sign_failed.emit(MWATypes.ErrorCode.NOT_SIGNED, "Android plugin not available")
 		return
 
-	if _busy:
+	if is_busy():
 		messages_sign_failed.emit(MWATypes.ErrorCode.BUSY, "Another operation is in progress")
 		return
 
@@ -473,7 +483,7 @@ func authorize_and_sign_transactions(payloads: Array, sign_in_payload = null) ->
 	if _android_plugin == null:
 		authorization_failed.emit(MWATypes.ErrorCode.AUTHORIZATION_FAILED, "Android plugin not available")
 		return
-	if _busy:
+	if is_busy():
 		authorization_failed.emit(MWATypes.ErrorCode.BUSY, "Another operation is in progress")
 		return
 
@@ -503,7 +513,7 @@ func authorize_and_sign_and_send_transactions(payloads: Array, sign_in_payload =
 	if _android_plugin == null:
 		authorization_failed.emit(MWATypes.ErrorCode.AUTHORIZATION_FAILED, "Android plugin not available")
 		return
-	if _busy:
+	if is_busy():
 		authorization_failed.emit(MWATypes.ErrorCode.BUSY, "Another operation is in progress")
 		return
 
@@ -539,7 +549,7 @@ func authorize_and_sign_messages(
 	if _android_plugin == null:
 		authorization_failed.emit(MWATypes.ErrorCode.AUTHORIZATION_FAILED, "Android plugin not available")
 		return
-	if _busy:
+	if is_busy():
 		authorization_failed.emit(MWATypes.ErrorCode.BUSY, "Another operation is in progress")
 		return
 
