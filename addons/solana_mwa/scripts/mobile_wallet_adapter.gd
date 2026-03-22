@@ -29,13 +29,40 @@ signal clone_failed(error_message: String)
 signal state_changed(new_state: int)
 signal debug_log(message: String)
 
+# --- Exported Properties (visible in Godot Inspector) ---
+
+## Blockchain cluster to connect to.
+@export_enum("Devnet", "Mainnet", "Testnet")
+var cluster: int = MWATypes.Cluster.DEVNET:
+	set(value):
+		if cluster != value:
+			cluster = value
+			custom_chain = ""
+			_invalidate_auth()
+
+## Custom chain identifier (e.g. "solana:localnet").
+## When set, overrides the cluster enum for the chain parameter.
+@export var custom_chain: String = "":
+	set(value):
+		if custom_chain != value:
+			custom_chain = value
+			_invalidate_auth()
+
+## Timeout in seconds for wallet operations.
+@export_range(5.0, 120.0, 1.0)
+var timeout_seconds: float = 30.0:
+	set(value):
+		timeout_seconds = value
+		if _android_plugin != null:
+			_android_plugin.call("setTimeoutMs", int(value * 1000))
+
+## Enable verbose debug logging.
+@export var debug_logging: bool = false
+
 # --- Properties ---
 
 ## Dapp identity presented to wallet during authorization.
 var identity = MWATypes.DappIdentity.new()
-
-## Blockchain cluster to connect to.
-var cluster: int = MWATypes.Cluster.DEVNET
 
 ## Authorization cache implementation. Defaults to MWAFileCache.
 var auth_cache: MWACache = MWAFileCache.new()
@@ -53,16 +80,6 @@ var current_auth = null
 ## Last queried wallet capabilities.
 var capabilities = null
 
-## Timeout in seconds for wallet operations.
-var timeout_seconds: float = 30.0:
-	set(value):
-		timeout_seconds = value
-		if _android_plugin != null:
-			_android_plugin.call("setTimeoutMs", int(value * 1000))
-
-## Enable verbose debug logging.
-var debug_logging: bool = false
-
 # --- Private ---
 
 var _android_plugin: Object = null
@@ -72,6 +89,19 @@ var _poll_start_time: float = 0.0
 
 
 # --- Helper Methods ---
+
+func _invalidate_auth() -> void:
+	if current_auth != null:
+		current_auth = null
+		if auth_cache != null:
+			auth_cache.clear()
+		state = MWATypes.ConnectionState.DISCONNECTED
+
+## Returns the chain identifier string for the current cluster/custom_chain.
+func _get_chain() -> String:
+	if custom_chain != "":
+		return custom_chain
+	return MWATypes.cluster_to_chain(cluster)
 
 ## Returns true if an operation is currently in progress.
 func is_busy() -> bool:
@@ -180,13 +210,22 @@ func _force_timeout() -> void:
 
 ## Authorize this dapp with a wallet. If a cached auth_token exists, attempts
 ## reauthorization first. Equivalent to React Native's transact → authorize().
-func authorize(sign_in_payload = null) -> void:
+## Optional features: request specific wallet features (MWA 2.0).
+## Optional addresses: filter authorization to specific addresses.
+func authorize(
+		sign_in_payload = null,
+		features: PackedStringArray = [],
+		addresses: PackedStringArray = []) -> void:
 	if _android_plugin == null:
-		authorization_failed.emit(MWATypes.ErrorCode.AUTHORIZATION_FAILED, "Android plugin not available")
+		authorization_failed.emit(
+			MWATypes.ErrorCode.AUTHORIZATION_FAILED,
+			"Android plugin not available")
 		return
 
 	if _busy:
-		authorization_failed.emit(MWATypes.ErrorCode.BUSY, "Another operation is in progress")
+		authorization_failed.emit(
+			MWATypes.ErrorCode.BUSY,
+			"Another operation is in progress")
 		return
 
 	state = MWATypes.ConnectionState.CONNECTING
@@ -199,15 +238,25 @@ func authorize(sign_in_payload = null) -> void:
 	if sign_in_payload != null:
 		sign_in_json = JSON.stringify(sign_in_payload.to_dict())
 
-	_android_plugin.call(
-		"authorize",
-		identity.uri,
-		identity.icon,
-		identity.name,
-		MWATypes.cluster_to_chain(cluster),
-		cached_token,
-		sign_in_json,
-	)
+	if features.size() > 0 or addresses.size() > 0:
+		var features_json := ""
+		if features.size() > 0:
+			features_json = JSON.stringify(Array(features))
+		var addresses_json := ""
+		if addresses.size() > 0:
+			addresses_json = JSON.stringify(Array(addresses))
+		_android_plugin.call(
+			"authorizeWithFeatures",
+			identity.uri, identity.icon, identity.name,
+			_get_chain(),
+			cached_token, sign_in_json,
+			features_json, addresses_json)
+	else:
+		_android_plugin.call(
+			"authorize",
+			identity.uri, identity.icon, identity.name,
+			_get_chain(),
+			cached_token, sign_in_json)
 	_start_operation("authorize")
 
 
@@ -229,7 +278,7 @@ func deauthorize() -> void:
 		return
 
 	state = MWATypes.ConnectionState.DEAUTHORIZING
-	var chain := MWATypes.cluster_to_chain(cluster)
+	var chain := _get_chain()
 	_android_plugin.call(
 		"deauthorize", identity.uri, identity.icon,
 		identity.name, chain, current_auth.auth_token)
@@ -255,7 +304,7 @@ func reconnect() -> void:
 ## Equivalent to React Native's transact → getCapabilities().
 func get_capabilities() -> void:
 	if _android_plugin == null:
-		capabilities_failed.emit(MWATypes.ErrorCode.BUSY, "Android plugin not available")
+		capabilities_failed.emit(MWATypes.ErrorCode.NOT_INITIALIZED, "Android plugin not available")
 		return
 
 	if _busy:
@@ -266,7 +315,7 @@ func get_capabilities() -> void:
 	if current_auth != null and current_auth.auth_token != "":
 		auth_token = current_auth.auth_token
 
-	var chain := MWATypes.cluster_to_chain(cluster)
+	var chain := _get_chain()
 	_android_plugin.call(
 		"getCapabilities", identity.uri, identity.icon,
 		identity.name, chain, auth_token)
@@ -294,7 +343,7 @@ func sign_transactions(payloads: Array) -> void:
 	for payload in payloads:
 		encoded.append(Marshalls.raw_to_base64(payload))
 
-	var chain := MWATypes.cluster_to_chain(cluster)
+	var chain := _get_chain()
 	_android_plugin.call(
 		"signTransactions", identity.uri, identity.icon,
 		identity.name, chain, current_auth.auth_token, encoded)
@@ -326,7 +375,7 @@ func sign_and_send_transactions(payloads: Array, options = null) -> void:
 	if options != null:
 		options_json = JSON.stringify(options.to_dict())
 
-	var chain := MWATypes.cluster_to_chain(cluster)
+	var chain := _get_chain()
 	_android_plugin.call(
 		"signAndSendTransactions", identity.uri, identity.icon,
 		identity.name, chain, current_auth.auth_token, encoded, options_json)
@@ -358,7 +407,7 @@ func sign_messages(messages: Array, addresses: PackedStringArray = []) -> void:
 	if addresses.is_empty() and current_auth.accounts.size() > 0:
 		addresses.append(current_auth.accounts[0].address)
 
-	var chain := MWATypes.cluster_to_chain(cluster)
+	var chain := _get_chain()
 	_android_plugin.call(
 		"signMessages", identity.uri, identity.icon,
 		identity.name, chain, current_auth.auth_token, encoded, addresses)
@@ -443,7 +492,7 @@ func authorize_and_sign_transactions(payloads: Array, sign_in_payload = null) ->
 
 	_android_plugin.call("authorizeAndSignTransactions",
 		identity.uri, identity.icon, identity.name,
-		MWATypes.cluster_to_chain(cluster), cached_token, sign_in_json, encoded)
+		_get_chain(), cached_token, sign_in_json, encoded)
 	_start_operation("authorize_and_sign_transactions")
 
 
@@ -477,7 +526,7 @@ func authorize_and_sign_and_send_transactions(payloads: Array, sign_in_payload =
 
 	_android_plugin.call("authorizeAndSignAndSendTransactions",
 		identity.uri, identity.icon, identity.name,
-		MWATypes.cluster_to_chain(cluster), cached_token, sign_in_json, encoded, options_json)
+		_get_chain(), cached_token, sign_in_json, encoded, options_json)
 	_start_operation("authorize_and_sign_and_send_transactions")
 
 
@@ -509,7 +558,7 @@ func authorize_and_sign_messages(
 
 	_android_plugin.call("authorizeAndSignMessages",
 		identity.uri, identity.icon, identity.name,
-		MWATypes.cluster_to_chain(cluster), cached_token, sign_in_json, encoded, addresses)
+		_get_chain(), cached_token, sign_in_json, encoded, addresses)
 	_start_operation("authorize_and_sign_messages")
 
 
