@@ -104,14 +104,51 @@ class SolanaMWAPlugin(godot: Godot) : GodotPlugin(godot) {
         try {
             Log.d(TAG, "authorize: name=$identityName chain=$chain cached=${cachedAuthToken.isNotEmpty()}")
             val sender = getSender() ?: return
-            Log.d(TAG, "authorize: got sender, about to call mwaClient")
             mwaClient.authorize(
                 sender, identityUri, iconPath, identityName,
                 chain, cachedAuthToken, signInPayloadJson
             )
-            Log.d(TAG, "authorize: mwaClient.authorize returned")
         } catch (e: Throwable) {
             Log.e(TAG, "authorize: CAUGHT EXCEPTION", e)
+        }
+    }
+
+    @UsedByGodot
+    fun authorizeWithFeatures(
+        identityUri: String,
+        iconPath: String,
+        identityName: String,
+        chain: String,
+        cachedAuthToken: String,
+        signInPayloadJson: String,
+        featuresJson: String,
+        addressesJson: String
+    ) {
+        try {
+            Log.d(TAG, "authorizeWithFeatures: name=$identityName chain=$chain")
+            val sender = getSender() ?: return
+
+            val features: Array<String>? = if (featuresJson.isNotEmpty()) {
+                try {
+                    val arr = org.json.JSONArray(featuresJson)
+                    Array(arr.length()) { arr.getString(it) }
+                } catch (e: Exception) { null }
+            } else null
+
+            val addresses: Array<ByteArray>? = if (addressesJson.isNotEmpty()) {
+                try {
+                    val arr = org.json.JSONArray(addressesJson)
+                    Array(arr.length()) { Base64.decode(arr.getString(it), Base64.DEFAULT) }
+                } catch (e: Exception) { null }
+            } else null
+
+            mwaClient.authorize(
+                sender, identityUri, iconPath, identityName,
+                chain, cachedAuthToken, signInPayloadJson,
+                features, addresses
+            )
+        } catch (e: Throwable) {
+            Log.e(TAG, "authorizeWithFeatures: CAUGHT EXCEPTION", e)
         }
     }
 

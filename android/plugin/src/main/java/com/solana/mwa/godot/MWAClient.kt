@@ -18,11 +18,17 @@ import org.json.JSONObject
 
 object MWAErrorCode {
     const val AUTHORIZATION_FAILED = -1
+    const val INVALID_PAYLOADS = -2
+    const val NOT_SIGNED = -3
+    const val NOT_SUBMITTED = -4
+    const val NOT_CLONED = -5
+    const val TOO_MANY_PAYLOADS = -6
+    const val CLUSTER_NOT_SUPPORTED = -7
+    const val BUSY = -8
     const val NO_WALLET_FOUND = -10
     const val TIMEOUT = -11
     const val USER_DECLINED = -12
     const val NOT_INITIALIZED = -13
-    const val BUSY = -8
 }
 
 /**
@@ -50,9 +56,47 @@ class MWAClient {
     /** Timeout in milliseconds for wallet operations. */
     var timeoutMs: Long = 30_000L
 
-    // Persistent auth token for session reuse
-    private var cachedAuthToken: String? = null
-    private var cachedPublicKey: ByteArray? = null
+    // Persistent adapter instance — reused across operations to preserve
+    // walletUriBase routing (like KTX reference does).
+    private var walletAdapter: MobileWalletAdapter? = null
+    private var currentChain: String = ""
+    private var currentIdentityUri: String = ""
+    private var currentIconPath: String = ""
+    private var currentIdentityName: String = ""
+
+    private fun getOrCreateAdapter(
+        identityUri: String, iconPath: String,
+        identityName: String, chain: String,
+        authToken: String = ""
+    ): MobileWalletAdapter {
+        // Reuse existing adapter if identity and chain match.
+        val existing = walletAdapter
+        if (existing != null &&
+            currentChain == chain &&
+            currentIdentityUri == identityUri &&
+            currentIdentityName == identityName
+        ) {
+            if (authToken.isNotEmpty()) existing.authToken = authToken
+            return existing
+        }
+        // Create new adapter for new identity/chain.
+        val identity = buildIdentity(identityUri, iconPath, identityName)
+        val adapter = MobileWalletAdapter(connectionIdentity = identity)
+        adapter.blockchain = chainToBlockchain(chain)
+        if (authToken.isNotEmpty()) adapter.authToken = authToken
+        walletAdapter = adapter
+        currentChain = chain
+        currentIdentityUri = identityUri
+        currentIconPath = iconPath
+        currentIdentityName = identityName
+        return adapter
+    }
+
+    /** Clear the cached adapter (e.g., on deauthorize). */
+    fun clearAdapter() {
+        walletAdapter = null
+        currentChain = ""
+    }
 
     fun clearState() {
         status = 0
@@ -84,9 +128,33 @@ class MWAClient {
     }
 
     private fun classifyError(e: Exception): Int {
+        // Try typed exception classification first (protocol error codes).
+        if (e is com.solana.mobilewalletadapter.clientlib.protocol.JsonRpc20Client.JsonRpc20RemoteException) {
+            return when (e.code) {
+                -1 -> MWAErrorCode.AUTHORIZATION_FAILED
+                -2 -> MWAErrorCode.INVALID_PAYLOADS
+                -3 -> MWAErrorCode.NOT_SIGNED
+                -4 -> MWAErrorCode.NOT_SUBMITTED
+                -5 -> MWAErrorCode.NOT_CLONED
+                -6 -> MWAErrorCode.TOO_MANY_PAYLOADS
+                -7 -> MWAErrorCode.CLUSTER_NOT_SUPPORTED
+                else -> MWAErrorCode.AUTHORIZATION_FAILED
+            }
+        }
+
+        // Fall back to message-based classification.
         val msg = e.message?.lowercase() ?: ""
         return when {
-            msg.contains("decline") || msg.contains("cancel") || msg.contains("reject") -> MWAErrorCode.USER_DECLINED
+            msg.contains("decline") || msg.contains("cancel") ||
+                msg.contains("reject") -> MWAErrorCode.USER_DECLINED
+            msg.contains("invalid payload") ||
+                msg.contains("invalid transaction") -> MWAErrorCode.INVALID_PAYLOADS
+            msg.contains("not signed") -> MWAErrorCode.NOT_SIGNED
+            msg.contains("not submitted") ||
+                msg.contains("send failed") -> MWAErrorCode.NOT_SUBMITTED
+            msg.contains("too many") -> MWAErrorCode.TOO_MANY_PAYLOADS
+            msg.contains("cluster") ||
+                msg.contains("chain not supported") -> MWAErrorCode.CLUSTER_NOT_SUPPORTED
             else -> MWAErrorCode.AUTHORIZATION_FAILED
         }
     }
@@ -124,10 +192,43 @@ class MWAClient {
         )
     }
 
+    private fun parseSendOptions(optionsJson: String): TransactionParams {
+        var minContextSlot: Int? = null
+        var commitment: String? = null
+        var skipPreflight: Boolean? = null
+        var maxRetries: Int? = null
+        var waitForCommitment: Boolean? = null
+
+        if (optionsJson.isNotEmpty()) {
+            try {
+                val opts = JSONObject(optionsJson)
+                if (opts.has("min_context_slot"))
+                    minContextSlot = opts.getInt("min_context_slot")
+                if (opts.has("commitment"))
+                    commitment = opts.getString("commitment")
+                if (opts.has("skip_preflight"))
+                    skipPreflight = opts.getBoolean("skip_preflight")
+                if (opts.has("max_retries"))
+                    maxRetries = opts.getInt("max_retries")
+                if (opts.has("wait_for_commitment_to_send_next_transaction"))
+                    waitForCommitment = opts.getBoolean("wait_for_commitment_to_send_next_transaction")
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to parse send options: ${e.message}")
+            }
+        }
+        return TransactionParams(
+            minContextSlot, commitment, skipPreflight,
+            maxRetries, waitForCommitment
+        )
+    }
+
     private fun chainToBlockchain(chain: String): Blockchain {
         return when (chain) {
             "solana:devnet" -> Solana.Devnet
             "solana:testnet" -> Solana.Testnet
+            "solana:mainnet" -> Solana.Mainnet
+            // For custom chains, map to closest Solana cluster.
+            // The chain string is still passed via the MWA protocol.
             else -> Solana.Mainnet
         }
     }
@@ -143,7 +244,9 @@ class MWAClient {
         identityName: String,
         chain: String,
         existingAuthToken: String,
-        signInPayloadJson: String
+        signInPayloadJson: String,
+        features: Array<String>? = null,
+        addresses: Array<ByteArray>? = null
     ) {
         clearState()
         if (!busy.compareAndSet(false, true)) {
@@ -157,15 +260,9 @@ class MWAClient {
         }) {
             try {
                 Log.d(TAG, "authorize: building identity uri=$identityUri name=$identityName")
-                val identity = buildIdentity(identityUri, iconPath, identityName)
-                val blockchain = chainToBlockchain(chain)
-                val walletAdapter = MobileWalletAdapter(connectionIdentity = identity)
-                walletAdapter.blockchain = blockchain
-
-                // Reuse cached auth token if available.
-                if (existingAuthToken.isNotEmpty()) {
-                    walletAdapter.authToken = existingAuthToken
-                }
+                val walletAdapter = getOrCreateAdapter(
+                    identityUri, iconPath, identityName, chain, existingAuthToken
+                )
 
                 // Parse Sign In With Solana payload if provided.
                 var signInPayload: SignInWithSolana.Payload? = null
@@ -193,8 +290,6 @@ class MWAClient {
                     when (result) {
                         is TransactionResult.Success -> {
                             val authResult = result.authResult
-                            cachedAuthToken = authResult.authToken
-                            cachedPublicKey = authResult.publicKey
 
                             val json = buildAuthJson(authResult)
 
@@ -234,8 +329,6 @@ class MWAClient {
                     when (result) {
                         is TransactionResult.Success -> {
                             val authResult = result.authResult
-                            cachedAuthToken = authResult.authToken
-                            cachedPublicKey = authResult.publicKey
 
                             val json = buildAuthJson(authResult)
                             setSuccess(json.toString())
@@ -268,19 +361,15 @@ class MWAClient {
         }
         scope.launch {
             try {
-                val identity = buildIdentity(identityUri, iconPath, identityName)
-                val walletAdapter = MobileWalletAdapter(connectionIdentity = identity)
-                walletAdapter.blockchain = chainToBlockchain(chain)
-                walletAdapter.authToken = authToken
+                val walletAdapter = getOrCreateAdapter(
+                    identityUri, iconPath, identityName, chain, authToken
+                )
 
                 val result = withTimeoutOrNull(timeoutMs) {
-                    walletAdapter.transact(sender) { _ ->
-                        deauthorize(authToken)
-                    }
+                    walletAdapter.disconnect(sender)
                 }
 
-                cachedAuthToken = null
-                cachedPublicKey = null
+                clearAdapter()
 
                 when (result) {
                     is TransactionResult.Success -> {
@@ -298,8 +387,7 @@ class MWAClient {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "deauthorize error", e)
-                cachedAuthToken = null
-                cachedPublicKey = null
+                clearAdapter()
                 setSuccess("{}")
             }
         }
@@ -317,14 +405,9 @@ class MWAClient {
         }
         scope.launch {
             try {
-                val identity = buildIdentity(identityUri, iconPath, identityName)
-                val walletAdapter = MobileWalletAdapter(connectionIdentity = identity)
-                walletAdapter.blockchain = chainToBlockchain(chain)
-
-                val token = if (authToken.isNotEmpty()) authToken else cachedAuthToken
-                if (token != null && token.isNotEmpty()) {
-                    walletAdapter.authToken = token
-                }
+                val walletAdapter = getOrCreateAdapter(
+                    identityUri, iconPath, identityName, chain, authToken
+                )
 
                 val result = withTimeoutOrNull(timeoutMs) {
                     walletAdapter.transact(sender) { _ ->
@@ -383,10 +466,9 @@ class MWAClient {
         }
         scope.launch {
             try {
-                val identity = buildIdentity(identityUri, iconPath, identityName)
-                val walletAdapter = MobileWalletAdapter(connectionIdentity = identity)
-                walletAdapter.authToken = authToken
-                walletAdapter.blockchain = chainToBlockchain(chain)
+                val walletAdapter = getOrCreateAdapter(
+                    identityUri, iconPath, identityName, chain, authToken
+                )
 
                 val result = withTimeoutOrNull(timeoutMs) {
                     walletAdapter.transact(sender) { _ ->
@@ -447,29 +529,11 @@ class MWAClient {
         }
         scope.launch {
             try {
-                val identity = buildIdentity(identityUri, iconPath, identityName)
-                val walletAdapter = MobileWalletAdapter(connectionIdentity = identity)
-                walletAdapter.authToken = authToken
-                walletAdapter.blockchain = chainToBlockchain(chain)
+                val walletAdapter = getOrCreateAdapter(
+                    identityUri, iconPath, identityName, chain, authToken
+                )
 
-                // Parse options if provided.
-                var minContextSlot: Int? = null
-                var commitment: String? = null
-                var skipPreflight: Boolean? = null
-                var maxRetries: Int? = null
-
-                if (optionsJson.isNotEmpty()) {
-                    try {
-                        val opts = JSONObject(optionsJson)
-                        if (opts.has("min_context_slot")) minContextSlot = opts.getInt("min_context_slot")
-                        if (opts.has("commitment")) commitment = opts.getString("commitment")
-                        if (opts.has("skip_preflight")) skipPreflight = opts.getBoolean("skip_preflight")
-                        if (opts.has("max_retries")) maxRetries = opts.getInt("max_retries")
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Failed to parse send options: ${e.message}")
-                    }
-                }
-                val params = TransactionParams(minContextSlot, commitment, skipPreflight, maxRetries, null)
+                val params = parseSendOptions(optionsJson)
 
                 val result = withTimeoutOrNull(timeoutMs) {
                     walletAdapter.transact(sender) { _ ->
@@ -530,10 +594,9 @@ class MWAClient {
         }
         scope.launch {
             try {
-                val identity = buildIdentity(identityUri, iconPath, identityName)
-                val walletAdapter = MobileWalletAdapter(connectionIdentity = identity)
-                walletAdapter.blockchain = chainToBlockchain(chain)
-                walletAdapter.authToken = authToken
+                val walletAdapter = getOrCreateAdapter(
+                    identityUri, iconPath, identityName, chain, authToken
+                )
 
                 val result = withTimeoutOrNull(timeoutMs) {
                     walletAdapter.transact(sender) { _ ->
@@ -595,15 +658,21 @@ class MWAClient {
             setError(MWAErrorCode.AUTHORIZATION_FAILED, "Error: ${t.message}")
         }) {
             try {
-                val identity = buildIdentity(identityUri, iconPath, identityName)
-                val blockchain = chainToBlockchain(chain)
-                val walletAdapter = MobileWalletAdapter(connectionIdentity = identity)
-                walletAdapter.blockchain = blockchain
-                if (existingAuthToken.isNotEmpty()) walletAdapter.authToken = existingAuthToken
+                val walletAdapter = getOrCreateAdapter(
+                    identityUri, iconPath, identityName, chain, existingAuthToken
+                )
+
+                // Note: signInPayloadJson is accepted for API consistency but
+                // the KTX transact() auto-handles auth. For SIWS, use
+                // authorize(siws_payload) then sign_transactions() separately.
+                if (signInPayloadJson.isNotEmpty()) {
+                    Log.w(TAG, "authorizeAndSignTransactions: SIWS payload provided " +
+                        "but combined methods use transact() auto-auth. " +
+                        "Use authorize(siws) + sign_transactions() for SIWS flows.")
+                }
 
                 val result = withTimeoutOrNull(timeoutMs) {
                     walletAdapter.transact(sender) { _ ->
-                        // Both operations in ONE session
                         val signed = signTransactions(payloads)
                         signed
                     }
@@ -617,8 +686,6 @@ class MWAClient {
                 when (result) {
                     is TransactionResult.Success -> {
                         val authResult = result.authResult
-                        cachedAuthToken = authResult.authToken
-                        cachedPublicKey = authResult.publicKey
                         val json = buildAuthJson(authResult)
                         // Add signed payloads
                         val signedArr = JSONArray()
@@ -658,34 +725,19 @@ class MWAClient {
             setError(MWAErrorCode.AUTHORIZATION_FAILED, "Error: ${t.message}")
         }) {
             try {
-                val identity = buildIdentity(identityUri, iconPath, identityName)
-                val blockchain = chainToBlockchain(chain)
-                val walletAdapter = MobileWalletAdapter(connectionIdentity = identity)
-                walletAdapter.blockchain = blockchain
-                if (existingAuthToken.isNotEmpty()) walletAdapter.authToken = existingAuthToken
+                val walletAdapter = getOrCreateAdapter(
+                    identityUri, iconPath, identityName, chain, existingAuthToken
+                )
 
-                // Parse options if provided.
-                var minContextSlot: Int? = null
-                var commitment: String? = null
-                var skipPreflight: Boolean? = null
-                var maxRetries: Int? = null
-
-                if (optionsJson.isNotEmpty()) {
-                    try {
-                        val opts = JSONObject(optionsJson)
-                        if (opts.has("min_context_slot")) minContextSlot = opts.getInt("min_context_slot")
-                        if (opts.has("commitment")) commitment = opts.getString("commitment")
-                        if (opts.has("skip_preflight")) skipPreflight = opts.getBoolean("skip_preflight")
-                        if (opts.has("max_retries")) maxRetries = opts.getInt("max_retries")
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Failed to parse send options: ${e.message}")
-                    }
+                if (signInPayloadJson.isNotEmpty()) {
+                    Log.w(TAG, "authorizeAndSignAndSendTransactions: SIWS in " +
+                        "combined methods not supported. Use authorize(siws) separately.")
                 }
-                val params = TransactionParams(minContextSlot, commitment, skipPreflight, maxRetries, null)
+
+                val params = parseSendOptions(optionsJson)
 
                 val result = withTimeoutOrNull(timeoutMs) {
                     walletAdapter.transact(sender) { _ ->
-                        // Both operations in ONE session
                         val sigs = signAndSendTransactions(payloads, params)
                         sigs
                     }
@@ -699,8 +751,6 @@ class MWAClient {
                 when (result) {
                     is TransactionResult.Success -> {
                         val authResult = result.authResult
-                        cachedAuthToken = authResult.authToken
-                        cachedPublicKey = authResult.publicKey
                         val json = buildAuthJson(authResult)
                         // Add signatures
                         val sigArr = JSONArray()
@@ -740,15 +790,17 @@ class MWAClient {
             setError(MWAErrorCode.AUTHORIZATION_FAILED, "Error: ${t.message}")
         }) {
             try {
-                val identity = buildIdentity(identityUri, iconPath, identityName)
-                val blockchain = chainToBlockchain(chain)
-                val walletAdapter = MobileWalletAdapter(connectionIdentity = identity)
-                walletAdapter.blockchain = blockchain
-                if (existingAuthToken.isNotEmpty()) walletAdapter.authToken = existingAuthToken
+                val walletAdapter = getOrCreateAdapter(
+                    identityUri, iconPath, identityName, chain, existingAuthToken
+                )
+
+                if (signInPayloadJson.isNotEmpty()) {
+                    Log.w(TAG, "authorizeAndSignMessages: SIWS in combined " +
+                        "methods not supported. Use authorize(siws) separately.")
+                }
 
                 val result = withTimeoutOrNull(timeoutMs) {
                     walletAdapter.transact(sender) { _ ->
-                        // Both operations in ONE session
                         val signed = signMessagesDetached(messages, addresses)
                         signed
                     }
@@ -762,8 +814,6 @@ class MWAClient {
                 when (result) {
                     is TransactionResult.Success -> {
                         val authResult = result.authResult
-                        cachedAuthToken = authResult.authToken
-                        cachedPublicKey = authResult.publicKey
                         val json = buildAuthJson(authResult)
                         // Add signatures
                         val sigArr = JSONArray()
