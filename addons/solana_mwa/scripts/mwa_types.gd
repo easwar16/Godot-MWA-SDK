@@ -98,28 +98,62 @@ class Account:
 		acc.features = d.get("features", PackedStringArray())
 		return acc
 
+## Sign-In With Solana result returned inside AuthorizationResult.
+class SignInResult:
+	var public_key: PackedByteArray
+	var signed_message: PackedByteArray
+	var signature: PackedByteArray
+	var signature_type: String
+
+	static func from_dict(d: Dictionary) -> SignInResult:
+		var r := SignInResult.new()
+		var pk_b64: String = d.get("public_key", "")
+		if pk_b64 != "":
+			r.public_key = Marshalls.base64_to_raw(pk_b64)
+		var sm_b64: String = d.get("signed_message", "")
+		if sm_b64 != "":
+			r.signed_message = Marshalls.base64_to_raw(sm_b64)
+		var sig_b64: String = d.get("signature", "")
+		if sig_b64 != "":
+			r.signature = Marshalls.base64_to_raw(sig_b64)
+		r.signature_type = d.get("signature_type", "ed25519")
+		return r
+
 ## Authorization result returned from authorize/reauthorize.
 class AuthorizationResult:
 	var accounts: Array
 	var auth_token: String
 	var wallet_uri_base: String
-	var sign_in_result: Dictionary
+	var sign_in_result: SignInResult
 
 	func to_dict() -> Dictionary:
 		var accs: Array = []
 		for acc in accounts:
 			accs.append(acc.to_dict())
-		return {
+		var d := {
 			"accounts": accs,
 			"auth_token": auth_token,
 			"wallet_uri_base": wallet_uri_base,
 		}
+		if sign_in_result != null:
+			d["sign_in_result"] = {
+				"public_key": Marshalls.raw_to_base64(
+					sign_in_result.public_key),
+				"signed_message": Marshalls.raw_to_base64(
+					sign_in_result.signed_message),
+				"signature": Marshalls.raw_to_base64(
+					sign_in_result.signature),
+				"signature_type": sign_in_result.signature_type,
+			}
+		return d
 
 	static func from_dict(d: Dictionary) -> AuthorizationResult:
 		var result := AuthorizationResult.new()
 		result.auth_token = d.get("auth_token", "")
 		result.wallet_uri_base = d.get("wallet_uri_base", "")
-		result.sign_in_result = d.get("sign_in_result", {})
+		var siws_dict: Dictionary = d.get("sign_in_result", {})
+		if not siws_dict.is_empty():
+			result.sign_in_result = SignInResult.from_dict(siws_dict)
 		var accs_raw: Array = d.get("accounts", [])
 		for acc_d in accs_raw:
 			result.accounts.append(Account.from_dict(acc_d))
@@ -158,7 +192,7 @@ class SendOptions:
 
 	func _init() -> void:
 		min_context_slot = -1
-		commitment = "confirmed"
+		commitment = ""
 		skip_preflight = false
 		max_retries = -1
 		wait_for_commitment_to_send_next_transaction = false
@@ -167,11 +201,14 @@ class SendOptions:
 		var d := {}
 		if min_context_slot >= 0:
 			d["min_context_slot"] = min_context_slot
-		d["commitment"] = commitment
-		d["skip_preflight"] = skip_preflight
+		if commitment != "":
+			d["commitment"] = commitment
+		if skip_preflight:
+			d["skip_preflight"] = skip_preflight
 		if max_retries >= 0:
 			d["max_retries"] = max_retries
-		d["wait_for_commitment"] = wait_for_commitment_to_send_next_transaction
+		if wait_for_commitment_to_send_next_transaction:
+			d["wait_for_commitment_to_send_next_transaction"] = true
 		return d
 
 ## Sign In With Solana payload.
